@@ -1,0 +1,128 @@
+---
+import { sections } from '../data/songs';
+
+const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si=81e91246d96f48a1';
+---
+
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">Off The Map</a>
+
+    <div class="nav-links">
+      {sections.map((s) => (
+        <a class="nav-link" href={`#${s.id}`}>{s.title}</a>
+      ))}
+    </div>
+
+    <a class="playlist" href={playlistUrl} target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.26c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.58-1.04 8.5-.6 11.65 1.32.36.22.47.68.26 1.04Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.99-8.15-2.56-11.97-1.4a.94.94 0 1 1-.55-1.8c4.37-1.32 9.8-.68 13.5 1.6a.94.94 0 0 1 .31 1.29Zm.13-3.4C15.98 8.4 9.5 8.18 5.8 9.3a1.13 1.13 0 1 1-.66-2.16c4.25-1.29 11.4-1.03 15.9 1.63a1.13 1.13 0 0 1-1.14 1.95Z"
+        ></path>
+      </svg>
+      Playlist
+    </a>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--ink);
+    border-bottom: var(--border-w) solid var(--pink);
+    padding: 0.65rem 0;
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .brand {
+    font-family: 'Archivo Black', sans-serif;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    color: var(--paper);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-link {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 0.72rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--periwinkle);
+    color: var(--ink);
+    text-decoration: none;
+    border: 2px solid var(--paper);
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 0 var(--paper);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 0 var(--paper);
+  }
+
+  .playlist {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 0.72rem;
+    padding: 0.4rem 0.85rem;
+    background: var(--lime);
+    color: var(--ink);
+    text-decoration: none;
+    border: 2px solid var(--paper);
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 0 var(--paper);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    white-space: nowrap;
+  }
+
+  .playlist:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 0 var(--paper);
+  }
+
+  @media (max-width: 640px) {
+    .nav-inner {
+      justify-content: center;
+    }
+
+    .brand {
+      flex: 1 0 100%;
+      text-align: center;
+    }
+
+    .nav-links {
+      justify-content: center;
+      flex: 1 0 100%;
+    }
+
+    .playlist {
+      margin: 0 auto;
+    }
+  }
+</style>

@@ -36,7 +36,7 @@ export const sections: Section[] = [
   {
     id: 'ensaio-1',
     title: 'Ensaio 1',
-    subtitle: 'The one where everyone shows up sweaty and we play RHCP and Foo Fighters until our hands fall off.',
+    subtitle: 'Aquele em que todo mundo chega transpirando e a gente toca RHCP e Foo Fighters até as mãos caírem.',
     accent: 'pink',
     songs: [
       { title: 'Californication', artist: 'Red Hot Chili Peppers', length: '5:21' },
@@ -66,7 +66,7 @@ export const sections: Section[] = [
   {
     id: 'ensaio-2',
     title: 'Ensaio 2',
-    subtitle: "Indie, post-punk, a bit of grunge, and some proper Brazilian classics thrown in so nobody's homesick.",
+    subtitle: 'Indie, post-punk, um pouco de grunge e uns clássicos brasileiros de respeito pra ninguém sentir saudade de casa.',
     accent: 'periwinkle',
     songs: [
       { title: 'Last Nite', artist: 'The Strokes', length: '3:17' },
@@ -95,7 +95,7 @@ export const sections: Section[] = [
   {
     id: 'ensaio-3',
     title: 'Ensaio 3',
-    subtitle: 'Afinações alternativas — drop tunings, capos everywhere, and everyone pretending they remembered to retune.',
+    subtitle: 'Afinações alternativas — drop tunings, capotraste pra todo lado, e todo mundo fingindo que lembrou de afinar de novo.',
     accent: 'lime',
     songs: [
       { title: 'Somebody Told Me', artist: 'The Killers', length: '3:17' },

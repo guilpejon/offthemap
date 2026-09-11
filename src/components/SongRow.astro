@@ -18,7 +18,7 @@ const { index, song, accent } = Astro.props;
     <span class="artist">{song.artist}</span>
   </span>
   <span class="length">{song.length}</span>
-  <a class="play" href={spotifyLink(song)} target="_blank" rel="noopener noreferrer" aria-label={`Listen to ${song.title} by ${song.artist} on Spotify`}>
+  <a class="play" href={spotifyLink(song)} target="_blank" rel="noopener noreferrer" aria-label={`Ouvir ${song.title}, de ${song.artist}, no Spotify`}>
     <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
       <path
         fill="currentColor"
@@ -83,17 +83,18 @@ const { index, song, accent } = Astro.props;
     width: 2.1rem;
     height: 2.1rem;
     border-radius: 50%;
-    border: 2px solid currentColor;
+    border: 2px solid var(--ink);
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: inherit;
-    transition: transform 0.12s ease, background 0.12s ease;
+    background: var(--paper);
+    color: var(--ink);
+    transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
   }
 
   .play:hover {
-    background: currentColor;
+    background: var(--ink);
     color: var(--paper);
     transform: scale(1.06);
   }

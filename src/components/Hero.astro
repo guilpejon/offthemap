@@ -4,7 +4,7 @@ import { sections } from '../data/songs';
 const songCount = sections.reduce((n, s) => n + s.songs.length, 0);
 ---
 
-<header class="hero">
+<header class="hero" id="top">
   <div class="doodle" aria-hidden="true">
     <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
       <polyline
@@ -19,24 +19,16 @@ const songCount = sections.reduce((n, s) => n + s.songs.length, 0);
   <div class="wrap hero-inner">
     <span class="badge hard-sm hero-badge">
       <span class="dot" style="color: var(--lime);"></span>
-      A hobby band, technically
+      Banda hobby, tecnicamente
     </span>
 
     <h1 class="hero-title">
-      <span class="line">Off The Map</span>
-      <span class="line highlight">plays everything.</span>
+      <span class="line highlight">Off The Map</span>
     </h1>
 
-    <p class="hero-sub">
-      Four-ish people in their thirties who still have day jobs, still load their own gear, and still argue
-      about tempo. We rehearse in three sets — here's every song we've currently got in rotation, with how
-      long each one runs, so nobody's surprised at 11pm.
-    </p>
-
     <div class="hero-stats">
-      <span class="badge hard-sm stat"><strong>{songCount}</strong>&nbsp;songs</span>
+      <span class="badge hard-sm stat"><strong>{songCount}</strong>&nbsp;músicas</span>
       <span class="badge hard-sm stat"><strong>{sections.length}</strong>&nbsp;ensaios</span>
-      <span class="badge hard-sm stat"><strong>0</strong>&nbsp;plans to tour</span>
     </div>
   </div>
 </header>
@@ -100,12 +92,6 @@ const songCount = sections.reduce((n, s) => n + s.songs.length, 0);
     width: fit-content;
     max-width: 100%;
     box-sizing: border-box;
-  }
-
-  .hero-sub {
-    max-width: 46rem;
-    font-size: 1.05rem;
-    color: #d8d8ea;
   }
 
   .hero-stats {
