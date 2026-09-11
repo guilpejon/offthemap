@@ -31,7 +31,13 @@ const total = allSongs().length;
     </div>
 
     <div class="chart-card hard">
-      <span class="sticker hard-sm">👑 {top.artist}</span>
+      <span class="sticker hard-sm">
+        <svg class="crown-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path fill="currentColor" d="M2 7l5 4 5-7 5 7 5-4-2 10H4L2 7Z"></path>
+          <rect x="3" y="17" width="18" height="2.5" fill="currentColor"></rect>
+        </svg>
+        {top.artist}
+      </span>
       <h3>Músicas por banda</h3>
       <ArtistChart />
     </div>
@@ -155,6 +161,13 @@ const total = allSongs().length;
     font-size: 0.72rem;
     max-width: 65%;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .crown-icon {
+    flex-shrink: 0;
   }
 
   @media (max-width: 640px) {
