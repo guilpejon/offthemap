@@ -1,0 +1,119 @@
+---
+import type { Song } from '../data/songs';
+import { spotifyLink } from '../data/songs';
+
+interface Props {
+  index: number;
+  song: Song;
+  accent: string;
+}
+
+const { index, song, accent } = Astro.props;
+---
+
+<li class="row">
+  <span class="num hard-sm" style={`background: ${accent};`}>{index}</span>
+  <span class="info">
+    <span class="title">{song.title}</span>
+    <span class="artist">{song.artist}</span>
+  </span>
+  <span class="length">{song.length}</span>
+  <a class="play" href={spotifyLink(song)} target="_blank" rel="noopener noreferrer" aria-label={`Listen to ${song.title} by ${song.artist} on Spotify`}>
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.26c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.58-1.04 8.5-.6 11.65 1.32.36.22.47.68.26 1.04Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.99-8.15-2.56-11.97-1.4a.94.94 0 1 1-.55-1.8c4.37-1.32 9.8-.68 13.5 1.6a.94.94 0 0 1 .31 1.29Zm.13-3.4C15.98 8.4 9.5 8.18 5.8 9.3a1.13 1.13 0 1 1-.66-2.16c4.25-1.29 11.4-1.03 15.9 1.63a1.13 1.13 0 0 1-1.14 1.95Z"
+      ></path>
+    </svg>
+  </a>
+</li>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 2.4rem 1fr auto 2.2rem;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.65rem 0.25rem;
+    border-bottom: 2px dashed color-mix(in srgb, currentColor 20%, transparent);
+  }
+
+  .row:last-child {
+    border-bottom: none;
+  }
+
+  .num {
+    width: 2.1rem;
+    height: 2.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    box-shadow: 3px 3px 0 0 var(--ink);
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  .title {
+    font-weight: 700;
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .artist {
+    font-size: 0.82rem;
+    opacity: 0.65;
+  }
+
+  .length {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .play {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.12s ease, background 0.12s ease;
+  }
+
+  .play:hover {
+    background: currentColor;
+    color: var(--paper);
+    transform: scale(1.06);
+  }
+
+  @media (max-width: 520px) {
+    .row {
+      grid-template-columns: 2rem 1fr auto;
+      row-gap: 0.3rem;
+    }
+
+    .play {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      justify-self: end;
+    }
+
+    .length {
+      grid-column: 2;
+      justify-self: start;
+      opacity: 0.7;
+    }
+  }
+</style>

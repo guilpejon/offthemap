@@ -1,0 +1,44 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import SectionBlock from '../components/SectionBlock.astro';
+import { sections } from '../data/songs';
+---
+
+<Layout title="Off The Map — setlists">
+  <Hero />
+
+  {sections.map((section, i) => (
+    <SectionBlock section={section} dark={i % 2 === 1} />
+  ))}
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <p>
+        Off The Map — a band of people with day jobs. Song lengths are standard studio versions, our
+        rehearsals usually run long anyway.
+      </p>
+      <p class="muted">Made by the band, hosted for free on GitHub Pages.</p>
+    </div>
+  </footer>
+</Layout>
+
+<style>
+  .footer {
+    background: var(--paper);
+    color: var(--ink);
+    padding: 2.5rem 0 3rem;
+    border-top: var(--border-w) solid var(--ink);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  .muted {
+    opacity: 0.6;
+  }
+</style>

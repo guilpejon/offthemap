@@ -1,0 +1,138 @@
+---
+import type { Section } from '../data/songs';
+import { totalLength } from '../data/songs';
+import SongRow from './SongRow.astro';
+
+interface Props {
+  section: Section;
+  dark: boolean;
+}
+
+const { section, dark } = Astro.props;
+
+const accentVar: Record<Section['accent'], string> = {
+  pink: 'var(--pink)',
+  periwinkle: 'var(--periwinkle)',
+  lime: 'var(--lime)',
+  sky: 'var(--sky)',
+};
+const accent = accentVar[section.accent];
+---
+
+<section id={section.id} class:list={['sect', { dark }]} style={`--accent: ${accent};`}>
+  {dark && <div class="dots dot-grid" aria-hidden="true"></div>}
+  <div class="wrap">
+    <div class="sect-head">
+      <span class="badge hard-sm tag">{section.title}</span>
+      <h2>{section.title}</h2>
+      <p class="subtitle">{section.subtitle}</p>
+      <div class="stats">
+        <span class="badge hard-sm stat"><strong>{section.songs.length}</strong>&nbsp;songs</span>
+        <span class="badge hard-sm stat"><strong>{totalLength(section.songs)}</strong></span>
+      </div>
+    </div>
+
+    <ol class="song-list hard">
+      {section.songs.map((song, i) => (
+        <SongRow index={i + 1} song={song} accent={accent} />
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .sect {
+    position: relative;
+    padding: 4rem 0;
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  .sect.dark {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .dots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .sect-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-bottom: 2.2rem;
+    position: relative;
+  }
+
+  .tag {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: currentColor;
+  }
+
+  .sect.dark .tag {
+    border-color: var(--paper);
+    box-shadow: 4px 4px 0 0 var(--paper);
+  }
+
+  h2 {
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+
+  .subtitle {
+    max-width: 40rem;
+    opacity: 0.75;
+    font-size: 1rem;
+  }
+
+  .stats {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .sect.dark .stat {
+    background: transparent;
+    border-color: var(--paper);
+    color: var(--paper);
+    box-shadow: 4px 4px 0 0 var(--paper);
+  }
+
+  .stat strong {
+    font-family: 'Archivo Black', sans-serif;
+  }
+
+  .song-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem 1.2rem;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: var(--shadow-x) var(--shadow-y) 0 0 var(--accent);
+    position: relative;
+  }
+
+  .sect.dark .song-list {
+    border-color: var(--paper);
+  }
+
+  @media (max-width: 640px) {
+    .sect {
+      padding: 3rem 0;
+    }
+
+    .song-list {
+      padding: 0.4rem 0.8rem;
+    }
+  }
+</style>

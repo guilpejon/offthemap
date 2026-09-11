@@ -1,0 +1,134 @@
+---
+import { sections } from '../data/songs';
+
+const songCount = sections.reduce((n, s) => n + s.songs.length, 0);
+---
+
+<header class="hero">
+  <div class="doodle" aria-hidden="true">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+      <polyline
+        points="0,60 60,60 90,10 130,110 170,20 210,90 250,40 290,70 330,15 900,15 940,80 980,30 1020,95 1060,45 1100,60 1200,60"
+        fill="none"
+        stroke="var(--periwinkle)"
+        stroke-width="3"
+      ></polyline>
+    </svg>
+  </div>
+
+  <div class="wrap hero-inner">
+    <span class="badge hard-sm hero-badge">
+      <span class="dot" style="color: var(--lime);"></span>
+      A hobby band, technically
+    </span>
+
+    <h1 class="hero-title">
+      <span class="line">Off The Map</span>
+      <span class="line highlight">plays everything.</span>
+    </h1>
+
+    <p class="hero-sub">
+      Four-ish people in their thirties who still have day jobs, still load their own gear, and still argue
+      about tempo. We rehearse in three sets — here's every song we've currently got in rotation, with how
+      long each one runs, so nobody's surprised at 11pm.
+    </p>
+
+    <div class="hero-stats">
+      <span class="badge hard-sm stat"><strong>{songCount}</strong>&nbsp;songs</span>
+      <span class="badge hard-sm stat"><strong>{sections.length}</strong>&nbsp;ensaios</span>
+      <span class="badge hard-sm stat"><strong>0</strong>&nbsp;plans to tour</span>
+    </div>
+  </div>
+</header>
+
+<style>
+  .hero {
+    position: relative;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4.5rem 0 4rem;
+    overflow: hidden;
+  }
+
+  .doodle {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 90px;
+    opacity: 0.5;
+  }
+
+  .doodle svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.6rem;
+  }
+
+  .hero-badge {
+    background: var(--ink);
+    border-color: var(--paper);
+    box-shadow: 4px 4px 0 0 var(--paper);
+    color: var(--paper);
+  }
+
+  .hero-title {
+    font-size: clamp(2.6rem, 8vw, 5.2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .hero-title .line {
+    display: inline-block;
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .hero-title .highlight {
+    color: var(--ink);
+    background: var(--paper);
+    border: var(--border-w) solid var(--paper);
+    box-shadow: var(--shadow-x) var(--shadow-y) 0 0 var(--pink);
+    border-radius: var(--radius);
+    padding: 0.1em 0.35em;
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero-sub {
+    max-width: 46rem;
+    font-size: 1.05rem;
+    color: #d8d8ea;
+  }
+
+  .hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .stat {
+    background: var(--periwinkle);
+    border-color: var(--paper);
+    box-shadow: 4px 4px 0 0 var(--paper);
+    color: var(--ink);
+  }
+
+  .stat strong {
+    font-family: 'Archivo Black', sans-serif;
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      padding: 3.5rem 0 5.5rem;
+    }
+  }
+</style>
