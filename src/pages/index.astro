@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
+import StatsSection from '../components/StatsSection.astro';
 import SectionBlock from '../components/SectionBlock.astro';
 import { sections } from '../data/songs';
 ---
@@ -9,6 +10,7 @@ import { sections } from '../data/songs';
 <Layout title="Off The Map — Repertório">
   <Nav />
   <Hero />
+  <StatsSection />
 
   {sections.map((section, i) => (
     <SectionBlock section={section} dark={i % 2 === 1} />

@@ -32,6 +32,42 @@ export function spotifyLink(song: Song): string {
   return spotifySearchUrl(song.title, song.artist);
 }
 
+export function allSongs(): Song[] {
+  return sections.flatMap((s) => s.songs);
+}
+
+export function artistCounts(): { artist: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const song of allSongs()) {
+    counts.set(song.artist, (counts.get(song.artist) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([artist, count]) => ({ artist, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+// Bands with more than one song get their own bar; everyone else gets
+// bundled into a single "Outras bandas" bar, always placed last.
+export function artistChartData(): { artist: string; count: number }[] {
+  const counts = artistCounts();
+  const main = counts.filter((c) => c.count > 1);
+  const rest = counts.filter((c) => c.count === 1);
+  const restTotal = rest.reduce((sum, c) => sum + c.count, 0);
+  const result = [...main];
+  if (rest.length > 0) {
+    result.push({ artist: `Outras bandas (${rest.length})`, count: restTotal });
+  }
+  return result;
+}
+
+export function totalRuntimeLabel(): string {
+  const totalSeconds = allSongs().reduce((sum, s) => sum + toSeconds(s.length), 0);
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return hours > 0 ? `${hours}h${minutes.toString().padStart(2, '0')}min` : `${minutes}min`;
+}
+
 export const sections: Section[] = [
   {
     id: 'ensaio-1',
