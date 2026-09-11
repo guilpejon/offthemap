@@ -8,24 +8,44 @@ const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si
   <div class="wrap nav-inner">
     <a class="brand" href="#top">Off The Map</a>
 
-    <div class="nav-links">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Abrir menu">
+      <span class="menu-icon" aria-hidden="true"></span>
+    </button>
+
+    <div class="nav-links" id="nav-links">
       <a class="nav-link" href="#numeros">Números</a>
       {sections.map((s) => (
         <a class="nav-link" href={`#${s.id}`}>{s.title}</a>
       ))}
+      <a class="playlist" href={playlistUrl} target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.26c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.58-1.04 8.5-.6 11.65 1.32.36.22.47.68.26 1.04Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.99-8.15-2.56-11.97-1.4a.94.94 0 1 1-.55-1.8c4.37-1.32 9.8-.68 13.5 1.6a.94.94 0 0 1 .31 1.29Zm.13-3.4C15.98 8.4 9.5 8.18 5.8 9.3a1.13 1.13 0 1 1-.66-2.16c4.25-1.29 11.4-1.03 15.9 1.63a1.13 1.13 0 0 1-1.14 1.95Z"
+          ></path>
+        </svg>
+        Playlist
+      </a>
     </div>
-
-    <a class="playlist" href={playlistUrl} target="_blank" rel="noopener noreferrer">
-      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.26c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.58-1.04 8.5-.6 11.65 1.32.36.22.47.68.26 1.04Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.99-8.15-2.56-11.97-1.4a.94.94 0 1 1-.55-1.8c4.37-1.32 9.8-.68 13.5 1.6a.94.94 0 0 1 .31 1.29Zm.13-3.4C15.98 8.4 9.5 8.18 5.8 9.3a1.13 1.13 0 1 1-.66-2.16c4.25-1.29 11.4-1.03 15.9 1.63a1.13 1.13 0 0 1-1.14 1.95Z"
-        ></path>
-      </svg>
-      Playlist
-    </a>
   </div>
 </nav>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const links = document.getElementById('nav-links');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = links?.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(Boolean(isOpen)));
+  });
+
+  links?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      links.classList.remove('is-open');
+      toggle?.setAttribute('aria-expanded', 'false');
+    });
+  });
+</script>
 
 <style>
   .nav {
@@ -38,6 +58,7 @@ const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si
   }
 
   .nav-inner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -56,8 +77,52 @@ const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si
 
   .nav-links {
     display: flex;
+    align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 40px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    background: var(--periwinkle);
+    border: 2px solid var(--paper);
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 0 var(--paper);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .menu-icon,
+  .menu-icon::before,
+  .menu-icon::after {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--ink);
+    border-radius: 1px;
+  }
+
+  .menu-icon {
+    position: relative;
+  }
+
+  .menu-icon::before,
+  .menu-icon::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+
+  .menu-icon::before {
+    top: -6px;
+  }
+
+  .menu-icon::after {
+    top: 6px;
   }
 
   .nav-link {
@@ -108,22 +173,36 @@ const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si
   }
 
   @media (max-width: 640px) {
-    .nav-inner {
-      justify-content: center;
-    }
-
-    .brand {
-      flex: 1 0 100%;
-      text-align: center;
+    .menu-toggle {
+      display: inline-flex;
     }
 
     .nav-links {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+      background: var(--ink);
+      border-bottom: var(--border-w) solid var(--pink);
+      padding: 0.75rem 1rem 1rem;
+    }
+
+    .nav-links.is-open {
+      display: flex;
+    }
+
+    .nav-link,
+    .playlist {
       justify-content: center;
-      flex: 1 0 100%;
+      text-align: center;
     }
 
     .playlist {
-      margin: 0 auto;
+      margin: 0;
     }
   }
 </style>

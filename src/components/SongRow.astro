@@ -52,6 +52,18 @@ const { index, song, accent } = Astro.props;
     font-size: 0.85rem;
     color: var(--ink);
     box-shadow: 3px 3px 0 0 var(--ink);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .num:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 0 var(--ink);
+  }
+
+  .num:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 0 var(--ink);
   }
 
   .info {

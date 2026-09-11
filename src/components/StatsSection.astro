@@ -63,6 +63,21 @@ const total = allSongs().length;
     gap: 0.9rem;
   }
 
+  .tag {
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .tag:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+
+  .tag:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--ink);
+  }
+
   h2 {
     font-size: clamp(2rem, 5vw, 3rem);
   }
@@ -88,6 +103,18 @@ const total = allSongs().length;
     flex-direction: column;
     gap: 0.15rem;
     min-width: 9.5rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .tile:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: calc(var(--shadow-x) + 3px) calc(var(--shadow-y) + 3px) 0 0 var(--ink);
+  }
+
+  .tile:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 var(--ink);
   }
 
   .tile strong {

@@ -73,11 +73,31 @@ const accent = accentVar[section.accent];
     background: var(--accent);
     color: var(--ink);
     border-color: currentColor;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .tag:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+
+  .tag:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--ink);
   }
 
   .sect.dark .tag {
     border-color: var(--paper);
     box-shadow: 4px 4px 0 0 var(--paper);
+  }
+
+  .sect.dark .tag:hover {
+    box-shadow: 6px 6px 0 0 var(--paper);
+  }
+
+  .sect.dark .tag:active {
+    box-shadow: 1px 1px 0 0 var(--paper);
   }
 
   h2 {
@@ -100,6 +120,18 @@ const accent = accentVar[section.accent];
     background: var(--paper);
     color: var(--ink);
     border-color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .stat:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+
+  .stat:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--ink);
   }
 
   .sect.dark .stat {
@@ -107,6 +139,14 @@ const accent = accentVar[section.accent];
     border-color: var(--paper);
     color: var(--paper);
     box-shadow: 4px 4px 0 0 var(--paper);
+  }
+
+  .sect.dark .stat:hover {
+    box-shadow: 6px 6px 0 0 var(--paper);
+  }
+
+  .sect.dark .stat:active {
+    box-shadow: 1px 1px 0 0 var(--paper);
   }
 
   .stat strong {

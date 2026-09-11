@@ -66,6 +66,18 @@ const songCount = sections.reduce((n, s) => n + s.songs.length, 0);
     border-color: var(--paper);
     box-shadow: 4px 4px 0 0 var(--paper);
     color: var(--paper);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .hero-badge:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--paper);
+  }
+
+  .hero-badge:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--paper);
   }
 
   .hero-title {
@@ -91,6 +103,18 @@ const songCount = sections.reduce((n, s) => n + s.songs.length, 0);
     width: fit-content;
     max-width: 100%;
     box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .hero-title .highlight:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: calc(var(--shadow-x) + 3px) calc(var(--shadow-y) + 3px) 0 0 var(--pink);
+  }
+
+  .hero-title .highlight:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 0 var(--pink);
   }
 
   .hero-stats {
@@ -105,6 +129,18 @@ const songCount = sections.reduce((n, s) => n + s.songs.length, 0);
     border-color: var(--paper);
     box-shadow: 4px 4px 0 0 var(--paper);
     color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .stat:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--paper);
+  }
+
+  .stat:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--paper);
   }
 
   .stat strong {
