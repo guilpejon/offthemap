@@ -30,6 +30,12 @@ const accent = accentVar[section.accent];
         <span class="badge hard-sm stat">{section.songs.length}&nbsp;músicas</span>
         <span class="badge hard-sm stat">{totalLength(section.songs)}</span>
       </div>
+      <div class="sort-bar" role="group" aria-label="Ordenar músicas">
+        <button type="button" class="badge hard-sm sort-btn" data-sort="alpha">A-Z</button>
+        <button type="button" class="badge hard-sm sort-btn" data-sort="length">Duração</button>
+        <button type="button" class="badge hard-sm sort-btn" data-sort="bpm">BPM</button>
+        <button type="button" class="badge hard-sm sort-btn" data-sort="key">Tom</button>
+      </div>
     </div>
 
     <ol class="song-list hard">
@@ -39,6 +45,75 @@ const accent = accentVar[section.accent];
     </ol>
   </div>
 </section>
+
+<script>
+  type SortKey = 'alpha' | 'length' | 'bpm' | 'key';
+  type SortState = { key: SortKey; dir: 'asc' | 'desc' } | null;
+
+  function getValue(row: HTMLElement, key: SortKey): string | number {
+    switch (key) {
+      case 'alpha':
+        return row.dataset.title ?? '';
+      case 'length':
+        return Number(row.dataset.lengthSeconds);
+      case 'bpm':
+        return Number(row.dataset.bpm);
+      case 'key':
+        return Number(row.dataset.keySort);
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('.sect').forEach((section) => {
+    const list = section.querySelector<HTMLOListElement>('.song-list');
+    const buttons = section.querySelectorAll<HTMLButtonElement>('.sort-btn');
+    if (!list || buttons.length === 0) return;
+
+    const rows = Array.from(list.children) as HTMLElement[];
+    rows.forEach((row, i) => {
+      row.dataset.originalOrder = String(i);
+    });
+
+    let activeSort: SortState = null;
+
+    function applySort() {
+      const items = Array.from(list!.children) as HTMLElement[];
+      if (!activeSort) {
+        items.sort((a, b) => Number(a.dataset.originalOrder) - Number(b.dataset.originalOrder));
+      } else {
+        const { key, dir } = activeSort;
+        items.sort((a, b) => {
+          const va = getValue(a, key);
+          const vb = getValue(b, key);
+          const cmp = typeof va === 'string' ? va.localeCompare(vb as string, 'pt-BR') : va - (vb as number);
+          return dir === 'asc' ? cmp : -cmp;
+        });
+      }
+      items.forEach((item) => list!.appendChild(item));
+    }
+
+    function updateButtonStates() {
+      buttons.forEach((btn) => {
+        btn.classList.remove('active-asc', 'active-desc');
+        if (activeSort && btn.dataset.sort === activeSort.key) {
+          btn.classList.add(activeSort.dir === 'asc' ? 'active-asc' : 'active-desc');
+        }
+      });
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.sort as SortKey;
+        if (activeSort && activeSort.key === key) {
+          activeSort = activeSort.dir === 'asc' ? { key, dir: 'desc' } : null;
+        } else {
+          activeSort = { key, dir: 'asc' };
+        }
+        applySort();
+        updateButtonStates();
+      });
+    });
+  });
+</script>
 
 <style>
   .sect {
@@ -151,6 +226,68 @@ const accent = accentVar[section.accent];
 
   .stat strong {
     font-family: 'Archivo Black', sans-serif;
+  }
+
+  .sort-bar {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .sort-btn {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--ink);
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, color 0.12s ease;
+  }
+
+  .sort-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+
+  .sort-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--ink);
+  }
+
+  .sort-btn.active-asc {
+    background: var(--accent);
+    color: var(--ink);
+  }
+
+  .sort-btn.active-desc {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .sect.dark .sort-btn {
+    background: transparent;
+    border-color: var(--paper);
+    color: var(--paper);
+    box-shadow: 4px 4px 0 0 var(--paper);
+  }
+
+  .sect.dark .sort-btn:hover {
+    box-shadow: 6px 6px 0 0 var(--paper);
+  }
+
+  .sect.dark .sort-btn:active {
+    box-shadow: 1px 1px 0 0 var(--paper);
+  }
+
+  .sect.dark .sort-btn.active-asc {
+    background: var(--accent);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .sect.dark .sort-btn.active-desc {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--ink);
   }
 
   .song-list {

@@ -1,7 +1,11 @@
+import popularityData from './spotify-popularity.json' with { type: 'json' };
+
 export type Song = {
   title: string;
   artist: string;
   length: string; // mm:ss
+  bpm: number;
+  key: string; // Camelot notation, e.g. "8A"
 };
 
 export type Section = {
@@ -12,28 +16,11 @@ export type Section = {
   songs: Song[];
 };
 
+type PopularityEntry = { url: string };
+const popularityMap = popularityData as Record<string, PopularityEntry>;
+
 function spotifySearchUrl(title: string, artist: string): string {
   return `https://open.spotify.com/search/${encodeURIComponent(`${title} ${artist}`)}`;
-}
-
-export function toSeconds(length: string): number {
-  const [min, sec] = length.split(':').map(Number);
-  return min * 60 + sec;
-}
-
-export function totalLength(songs: Song[]): string {
-  const totalSeconds = songs.reduce((sum, s) => sum + toSeconds(s.length), 0);
-  const min = Math.floor(totalSeconds / 60);
-  const sec = totalSeconds % 60;
-  return `${min}min ${sec}s`;
-}
-
-export function spotifyLink(song: Song): string {
-  return spotifySearchUrl(song.title, song.artist);
-}
-
-export function allSongs(): Song[] {
-  return sections.flatMap((s) => s.songs);
 }
 
 export function slugify(text: string): string {
@@ -45,8 +32,36 @@ export function slugify(text: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
-export function songSlug(song: Song): string {
+export function songSlug(song: Pick<Song, 'title' | 'artist'>): string {
   return slugify(`${song.artist}-${song.title}`);
+}
+
+export function toSeconds(length: string): number {
+  const [min, sec] = length.split(':').map(Number);
+  return min * 60 + sec;
+}
+
+// Camelot key (e.g. "8A") to a sortable number: wheel position first, A before B.
+export function keySortValue(key: string): number {
+  const match = key.match(/^(\d+)([AB])$/);
+  if (!match) return 0;
+  const [, num, letter] = match;
+  return Number(num) * 2 + (letter === 'A' ? 0 : 1);
+}
+
+export function totalLength(songs: Song[]): string {
+  const totalSeconds = songs.reduce((sum, s) => sum + toSeconds(s.length), 0);
+  const min = Math.floor(totalSeconds / 60);
+  const sec = totalSeconds % 60;
+  return `${min}min ${sec}s`;
+}
+
+export function spotifyLink(song: Song): string {
+  return popularityMap[songSlug(song)]?.url ?? spotifySearchUrl(song.title, song.artist);
+}
+
+export function allSongs(): Song[] {
+  return sections.flatMap((s) => s.songs);
 }
 
 export function uniqueSongs(): Song[] {
@@ -101,30 +116,30 @@ export const sections: Section[] = [
     subtitle: 'Aquele em que todo mundo chega transpirando e a gente toca RHCP e Foo Fighters até as mãos caírem.',
     accent: 'pink',
     songs: [
-      { title: 'Californication', artist: 'Red Hot Chili Peppers', length: '5:21' },
-      { title: 'Universally Speaking', artist: 'Red Hot Chili Peppers', length: '4:21' },
-      { title: 'Easily', artist: 'Red Hot Chili Peppers', length: '4:15' },
-      { title: 'Otherside', artist: 'Red Hot Chili Peppers', length: '4:15' },
-      { title: 'Scar Tissue', artist: 'Red Hot Chili Peppers', length: '3:37' },
-      { title: 'The Zephyr Song', artist: 'Red Hot Chili Peppers', length: '4:05' },
-      { title: 'By the Way', artist: 'Red Hot Chili Peppers', length: '3:37' },
-      { title: 'Suck My Kiss', artist: 'Red Hot Chili Peppers', length: '3:23' },
-      { title: 'Soul to Squeeze', artist: 'Red Hot Chili Peppers', length: '4:52' },
-      { title: 'Dani California', artist: 'Red Hot Chili Peppers', length: '4:41' },
-      { title: "Can't Stop", artist: 'Red Hot Chili Peppers', length: '4:29' },
-      { title: 'Subterranean Homesick Blues', artist: 'Red Hot Chili Peppers', length: '2:32' },
-      { title: "Don't Forget Me", artist: 'Red Hot Chili Peppers', length: '4:35' },
-      { title: 'Under the Bridge', artist: 'Red Hot Chili Peppers', length: '4:24' },
-      { title: 'Minor Thing', artist: 'Red Hot Chili Peppers', length: '3:01' },
-      { title: 'Times Like These', artist: 'Foo Fighters', length: '4:38' },
-      { title: 'Learn to Fly', artist: 'Foo Fighters', length: '3:54' },
-      { title: 'These Days', artist: 'Foo Fighters', length: '5:26' },
-      { title: 'Rescued', artist: 'Foo Fighters', length: '3:26' },
-      { title: 'Dear Rosemary', artist: 'Foo Fighters', length: '3:57' },
-      { title: 'Arlandria', artist: 'Foo Fighters', length: '4:20' },
-      { title: 'Everlong', artist: 'Foo Fighters', length: '4:10' },
-      { title: 'Rope', artist: 'Foo Fighters', length: '4:19' },
-      { title: 'My Hero', artist: 'Foo Fighters', length: '4:20' },
+      { title: 'Californication', artist: 'Red Hot Chili Peppers', length: '5:21', bpm: 97, key: '8A' },
+      { title: 'Universally Speaking', artist: 'Red Hot Chili Peppers', length: '4:21', bpm: 117, key: '10B' },
+      { title: 'Easily', artist: 'Red Hot Chili Peppers', length: '4:15', bpm: 124, key: '8A' },
+      { title: 'Otherside', artist: 'Red Hot Chili Peppers', length: '4:15', bpm: 123, key: '8A' },
+      { title: 'Scar Tissue', artist: 'Red Hot Chili Peppers', length: '3:37', bpm: 89, key: '7A' },
+      { title: 'The Zephyr Song', artist: 'Red Hot Chili Peppers', length: '4:05', bpm: 117, key: '10B' },
+      { title: 'By the Way', artist: 'Red Hot Chili Peppers', length: '3:37', bpm: 123, key: '8A' },
+      { title: 'Suck My Kiss', artist: 'Red Hot Chili Peppers', length: '3:23', bpm: 102, key: '7A' },
+      { title: 'Soul to Squeeze', artist: 'Red Hot Chili Peppers', length: '4:52', bpm: 88, key: '7B' },
+      { title: 'Dani California', artist: 'Red Hot Chili Peppers', length: '4:41', bpm: 96, key: '10B' },
+      { title: "Can't Stop", artist: 'Red Hot Chili Peppers', length: '4:29', bpm: 183, key: '9A' },
+      { title: 'Subterranean Homesick Blues', artist: 'Red Hot Chili Peppers', length: '2:32', bpm: 110, key: '8A' },
+      { title: "Don't Forget Me", artist: 'Red Hot Chili Peppers', length: '4:35', bpm: 124, key: '8A' },
+      { title: 'Under the Bridge', artist: 'Red Hot Chili Peppers', length: '4:24', bpm: 83, key: '12B' },
+      { title: 'Minor Thing', artist: 'Red Hot Chili Peppers', length: '3:01', bpm: 122, key: '11A' },
+      { title: 'Times Like These', artist: 'Foo Fighters', length: '4:38', bpm: 145, key: '9B' },
+      { title: 'Learn to Fly', artist: 'Foo Fighters', length: '3:54', bpm: 136, key: '1B' },
+      { title: 'These Days', artist: 'Foo Fighters', length: '5:26', bpm: 136, key: '1B' },
+      { title: 'Rescued', artist: 'Foo Fighters', length: '3:26', bpm: 151, key: '12B' },
+      { title: 'Dear Rosemary', artist: 'Foo Fighters', length: '3:57', bpm: 124, key: '10A' },
+      { title: 'Arlandria', artist: 'Foo Fighters', length: '4:20', bpm: 141, key: '12B' },
+      { title: 'Everlong', artist: 'Foo Fighters', length: '4:10', bpm: 158, key: '10B' },
+      { title: 'Rope', artist: 'Foo Fighters', length: '4:19', bpm: 139, key: '10B' },
+      { title: 'My Hero', artist: 'Foo Fighters', length: '4:20', bpm: 154, key: '12B' },
     ],
   },
   {
@@ -133,27 +148,27 @@ export const sections: Section[] = [
     subtitle: 'Indie, post-punk, um pouco de grunge e uns clássicos brasileiros de respeito pra ninguém sentir saudade de casa.',
     accent: 'periwinkle',
     songs: [
-      { title: 'Last Nite', artist: 'The Strokes', length: '3:17' },
-      { title: 'You Only Live Once', artist: 'The Strokes', length: '3:54' },
-      { title: 'Nice to Know You', artist: 'Incubus', length: '3:23' },
-      { title: 'Fake Tales of San Francisco', artist: 'Arctic Monkeys', length: '2:22' },
-      { title: 'Fluorescent Adolescent', artist: 'Arctic Monkeys', length: '3:09' },
-      { title: 'R U Mine?', artist: 'Arctic Monkeys', length: '3:24' },
-      { title: 'Do I Wanna Know?', artist: 'Arctic Monkeys', length: '4:32' },
-      { title: 'American Idiot', artist: 'Green Day', length: '2:54' },
-      { title: 'Take Me Out', artist: 'Franz Ferdinand', length: '3:57' },
-      { title: 'Valerie', artist: 'The Zutons', length: '3:41' },
-      { title: 'Come Together', artist: 'The Beatles', length: '4:19' },
-      { title: 'Plush', artist: 'Stone Temple Pilots', length: '5:13' },
-      { title: 'O Calibre', artist: 'Os Paralamas do Sucesso', length: '3:22' },
-      { title: 'Meu Erro', artist: 'Os Paralamas do Sucesso', length: '3:28' },
-      { title: 'Perfeição', artist: 'Legião Urbana', length: '4:36' },
-      { title: 'O Tempo Não Pára', artist: 'Cazuza', length: '4:37' },
-      { title: 'Fire', artist: 'The Jimi Hendrix Experience', length: '2:34' },
-      { title: 'Alive', artist: 'Pearl Jam', length: '5:41' },
-      { title: 'Black', artist: 'Pearl Jam', length: '5:43' },
-      { title: 'Anna Molly', artist: 'Incubus', length: '3:46' },
-      { title: 'Echo', artist: 'Incubus', length: '3:34' },
+      { title: 'Last Nite', artist: 'The Strokes', length: '3:17', bpm: 208, key: '8B' },
+      { title: 'You Only Live Once', artist: 'The Strokes', length: '3:54', bpm: 121, key: '1B' },
+      { title: 'Nice to Know You', artist: 'Incubus', length: '3:23', bpm: 154, key: '11A' },
+      { title: 'Fake Tales of San Francisco', artist: 'Arctic Monkeys', length: '2:22', bpm: 129, key: '10A' },
+      { title: 'Fluorescent Adolescent', artist: 'Arctic Monkeys', length: '3:09', bpm: 112, key: '12A' },
+      { title: 'R U Mine?', artist: 'Arctic Monkeys', length: '3:24', bpm: 97, key: '11A' },
+      { title: 'Do I Wanna Know?', artist: 'Arctic Monkeys', length: '4:32', bpm: 85, key: '6A' },
+      { title: 'American Idiot', artist: 'Green Day', length: '2:54', bpm: 186, key: '4B' },
+      { title: 'Take Me Out', artist: 'Franz Ferdinand', length: '3:57', bpm: 113, key: '9A' },
+      { title: 'Valerie', artist: 'The Zutons', length: '3:41', bpm: 83, key: '6B' },
+      { title: 'Come Together', artist: 'The Beatles', length: '4:19', bpm: 83, key: '7A' },
+      { title: 'Plush', artist: 'Stone Temple Pilots', length: '5:13', bpm: 101, key: '6A' },
+      { title: 'O Calibre', artist: 'Os Paralamas do Sucesso', length: '3:22', bpm: 90, key: '12B' },
+      { title: 'Meu Erro', artist: 'Os Paralamas do Sucesso', length: '3:28', bpm: 208, key: '11B' },
+      { title: 'Perfeição', artist: 'Legião Urbana', length: '4:36', bpm: 100, key: '8B' },
+      { title: 'O Tempo Não Pára', artist: 'Cazuza', length: '4:37', bpm: 77, key: '9B' },
+      { title: 'Fire', artist: 'The Jimi Hendrix Experience', length: '2:34', bpm: 155, key: '7A' },
+      { title: 'Alive', artist: 'Pearl Jam', length: '5:41', bpm: 99, key: '1B' },
+      { title: 'Black', artist: 'Pearl Jam', length: '5:43', bpm: 86, key: '9A' },
+      { title: 'Anna Molly', artist: 'Incubus', length: '3:46', bpm: 152, key: '5A' },
+      { title: 'Echo', artist: 'Incubus', length: '3:34', bpm: 135, key: '10B' },
     ],
   },
   {
@@ -162,27 +177,27 @@ export const sections: Section[] = [
     subtitle: 'Afinações alternativas — drop tunings, capotraste pra todo lado, e todo mundo fingindo que lembrou de afinar de novo.',
     accent: 'lime',
     songs: [
-      { title: 'Somebody Told Me', artist: 'The Killers', length: '3:17' },
-      { title: 'Mr. Brightside', artist: 'The Killers', length: '3:42' },
-      { title: 'Sex on Fire', artist: 'Kings of Leon', length: '3:23' },
-      { title: 'Use Somebody', artist: 'Kings of Leon', length: '3:52' },
-      { title: 'Like a Stone', artist: 'Audioslave', length: '4:53' },
-      { title: 'I Am the Highway', artist: 'Audioslave', length: '5:22' },
-      { title: 'Só Por Uma Noite', artist: 'Charlie Brown Jr.', length: '3:23' },
-      { title: 'Papo Reto', artist: 'Charlie Brown Jr.', length: '3:28' },
-      { title: 'Zóio de Lula', artist: 'Charlie Brown Jr.', length: '4:12' },
-      { title: 'Lugar ao Sol', artist: 'Charlie Brown Jr.', length: '3:31' },
-      { title: 'Song 2', artist: 'Blur', length: '2:02' },
-      { title: 'Nice to Know You', artist: 'Incubus', length: '3:23' },
-      { title: 'No One Knows', artist: 'Queens of the Stone Age', length: '4:14' },
-      { title: 'Aerials', artist: 'System of a Down', length: '4:01' },
-      { title: 'Heart-Shaped Box', artist: 'Nirvana', length: '4:41' },
-      { title: 'Sunday Bloody Sunday', artist: 'U2', length: '4:39' },
-      { title: 'Are You Gonna Be My Girl', artist: 'Jet', length: '3:32' },
-      { title: "Ain't No Rest for the Wicked", artist: 'Cage the Elephant', length: '3:07' },
-      { title: 'Notion', artist: 'The Rare Occasions', length: '2:52' },
-      { title: 'Creep', artist: 'Radiohead', length: '3:56' },
-      { title: 'Killing in the Name', artist: 'Rage Against the Machine', length: '5:14' },
+      { title: 'Somebody Told Me', artist: 'The Killers', length: '3:17', bpm: 138, key: '3A' },
+      { title: 'Mr. Brightside', artist: 'The Killers', length: '3:42', bpm: 148, key: '3B' },
+      { title: 'Sex on Fire', artist: 'Kings of Leon', length: '3:23', bpm: 153, key: '12B' },
+      { title: 'Use Somebody', artist: 'Kings of Leon', length: '3:52', bpm: 137, key: '8B' },
+      { title: 'Like a Stone', artist: 'Audioslave', length: '4:53', bpm: 108, key: '6A' },
+      { title: 'I Am the Highway', artist: 'Audioslave', length: '5:22', bpm: 87, key: '8B' },
+      { title: 'Só Por Uma Noite', artist: 'Charlie Brown Jr.', length: '3:23', bpm: 109, key: '12B' },
+      { title: 'Papo Reto', artist: 'Charlie Brown Jr.', length: '3:28', bpm: 101, key: '2B' },
+      { title: 'Zóio de Lula', artist: 'Charlie Brown Jr.', length: '4:12', bpm: 76, key: '12A' },
+      { title: 'Lugar ao Sol', artist: 'Charlie Brown Jr.', length: '3:31', bpm: 143, key: '6B' },
+      { title: 'Song 2', artist: 'Blur', length: '2:02', bpm: 130, key: '5A' },
+      { title: 'Nice to Know You', artist: 'Incubus', length: '3:23', bpm: 154, key: '11A' },
+      { title: 'No One Knows', artist: 'Queens of the Stone Age', length: '4:14', bpm: 169, key: '8B' },
+      { title: 'Aerials', artist: 'System of a Down', length: '4:01', bpm: 161, key: '5A' },
+      { title: 'Heart-Shaped Box', artist: 'Nirvana', length: '4:41', bpm: 101, key: '1A' },
+      { title: 'Sunday Bloody Sunday', artist: 'U2', length: '4:39', bpm: 201, key: '3B' },
+      { title: 'Are You Gonna Be My Girl', artist: 'Jet', length: '3:32', bpm: 210, key: '11B' },
+      { title: "Ain't No Rest for the Wicked", artist: 'Cage the Elephant', length: '3:07', bpm: 159, key: '9B' },
+      { title: 'Notion', artist: 'The Rare Occasions', length: '2:52', bpm: 159, key: '11B' },
+      { title: 'Creep', artist: 'Radiohead', length: '3:56', bpm: 92, key: '9B' },
+      { title: 'Killing in the Name', artist: 'Rage Against the Machine', length: '5:14', bpm: 129, key: '10B' },
     ],
   },
 ];

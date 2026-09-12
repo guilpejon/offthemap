@@ -1,6 +1,6 @@
 ---
 import type { Song } from '../data/songs';
-import { spotifyLink, songSlug } from '../data/songs';
+import { spotifyLink, songSlug, toSeconds, keySortValue } from '../data/songs';
 import { lyrics } from '../data/lyrics';
 
 interface Props {
@@ -15,7 +15,14 @@ const slug = songSlug(song);
 const hasLyrics = Boolean(lyrics[slug]);
 ---
 
-<li class="row">
+<li
+  class="row"
+  data-slug={slug}
+  data-title={song.title}
+  data-length-seconds={toSeconds(song.length)}
+  data-bpm={song.bpm}
+  data-key-sort={keySortValue(song.key)}
+>
   {hasLyrics ? (
     <a
       class="num hard-sm"
@@ -31,6 +38,7 @@ const hasLyrics = Boolean(lyrics[slug]);
   <span class="info">
     <span class="title">{song.title}</span>
     <span class="artist">{song.artist}</span>
+    <span class="meta">{song.bpm}&nbsp;BPM · {song.key}</span>
   </span>
   <span class="length">{song.length}</span>
   <a class="play" href={spotifyLink(song)} target="_blank" rel="noopener noreferrer" aria-label={`Ouvir ${song.title}, de ${song.artist}, no Spotify`}>
@@ -98,6 +106,12 @@ const hasLyrics = Boolean(lyrics[slug]);
   .artist {
     font-size: 0.82rem;
     opacity: 0.65;
+  }
+
+  .meta {
+    font-size: 0.72rem;
+    opacity: 0.5;
+    font-variant-numeric: tabular-nums;
   }
 
   .length {
