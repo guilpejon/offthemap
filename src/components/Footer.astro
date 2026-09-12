@@ -3,6 +3,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <footer class="footer">
+  <div class="dots dot-grid" aria-hidden="true"></div>
   <div class="wrap footer-inner">
     <a class="home-link" href={`${base}/`}>Off The Map</a>
     <a
@@ -24,13 +25,22 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <style>
   .footer {
-    background: var(--paper);
-    color: var(--ink);
+    position: relative;
+    background: var(--ink);
+    color: var(--paper);
     padding: 2.5rem 0 3rem;
-    border-top: var(--border-w) solid var(--ink);
+    border-top: var(--border-w) solid var(--pink);
+  }
+
+  .dots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
   }
 
   .footer-inner {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -49,7 +59,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   .social-link {
     display: inline-flex;
-    color: var(--ink);
+    color: var(--paper);
     transition: transform 0.12s ease;
   }
 
