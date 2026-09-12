@@ -15,6 +15,18 @@ export function getStaticPaths() {
 const { song } = Astro.props;
 const text = lyrics[songSlug(song)];
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+function renderLyrics(raw: string) {
+  const escape = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  return raw
+    .split('\n')
+    .map((line) => (line.trim() === 'Chorus' ? '<strong class="section-label">Chorus</strong>' : escape(line)))
+    .join('\n');
+}
+
+const lyricsHtml = renderLyrics(text);
 ---
 
 <Layout title={`${song.title} — ${song.artist} — Off The Map`} description={`Letra de ${song.title}, de ${song.artist}.`}>
@@ -27,7 +39,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <p class="meta">{song.bpm}&nbsp;BPM · {keyName(song.key)}</p>
     </header>
 
-    <pre class="lyrics">{text}</pre>
+    <pre class="lyrics" set:html={lyricsHtml} />
   </main>
 </Layout>
 
@@ -85,5 +97,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     font-size: 1.05rem;
     line-height: 1.7;
     margin: 0;
+  }
+
+  .lyrics :global(.section-label) {
+    display: inline-block;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.85rem;
+    opacity: 0.6;
   }
 </style>
