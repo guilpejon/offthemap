@@ -17,6 +17,11 @@ const accentVar: Record<Section['accent'], string> = {
   sky: 'var(--sky)',
 };
 const accent = accentVar[section.accent];
+
+// Default view is alphabetical; the row number reflects that default rank.
+const alphabeticalSongs = [...section.songs]
+  .sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
+  .map((song, i) => ({ song, index: i + 1 }));
 ---
 
 <section id={section.id} class:list={['sect', { dark }]} style={`--accent: ${accent};`}>
@@ -26,12 +31,9 @@ const accent = accentVar[section.accent];
       <span class="badge hard-sm tag">{section.title}</span>
       <h2>{section.title}</h2>
       <p class="subtitle">{section.subtitle}</p>
-      <div class="stats">
-        <span class="badge hard-sm stat">{section.songs.length}&nbsp;músicas</span>
-        <span class="badge hard-sm stat">{totalLength(section.songs)}</span>
-      </div>
+      <p class="stats-text">{section.songs.length}&nbsp;músicas · {totalLength(section.songs)}</p>
       <div class="sort-bar" role="group" aria-label="Ordenar músicas">
-        <button type="button" class="badge hard-sm sort-btn" data-sort="alpha">A-Z</button>
+        <button type="button" class="badge hard-sm sort-btn active-asc" data-sort="alpha">A-Z</button>
         <button type="button" class="badge hard-sm sort-btn" data-sort="length">Duração</button>
         <button type="button" class="badge hard-sm sort-btn" data-sort="bpm">BPM</button>
         <button type="button" class="badge hard-sm sort-btn" data-sort="key">Tom</button>
@@ -39,8 +41,8 @@ const accent = accentVar[section.accent];
     </div>
 
     <ol class="song-list hard">
-      {section.songs.map((song, i) => (
-        <SongRow index={i + 1} song={song} accent={accent} />
+      {alphabeticalSongs.map(({ song, index }) => (
+        <SongRow index={index} song={song} accent={accent} />
       ))}
     </ol>
   </div>
@@ -48,7 +50,9 @@ const accent = accentVar[section.accent];
 
 <script>
   type SortKey = 'alpha' | 'length' | 'bpm' | 'key';
-  type SortState = { key: SortKey; dir: 'asc' | 'desc' } | null;
+  type SortState = { key: SortKey; dir: 'asc' | 'desc' };
+
+  const DEFAULT_SORT: SortState = { key: 'alpha', dir: 'asc' };
 
   function getValue(row: HTMLElement, key: SortKey): string | number {
     switch (key) {
@@ -68,33 +72,24 @@ const accent = accentVar[section.accent];
     const buttons = section.querySelectorAll<HTMLButtonElement>('.sort-btn');
     if (!list || buttons.length === 0) return;
 
-    const rows = Array.from(list.children) as HTMLElement[];
-    rows.forEach((row, i) => {
-      row.dataset.originalOrder = String(i);
-    });
-
-    let activeSort: SortState = null;
+    let activeSort: SortState = DEFAULT_SORT;
 
     function applySort() {
       const items = Array.from(list!.children) as HTMLElement[];
-      if (!activeSort) {
-        items.sort((a, b) => Number(a.dataset.originalOrder) - Number(b.dataset.originalOrder));
-      } else {
-        const { key, dir } = activeSort;
-        items.sort((a, b) => {
-          const va = getValue(a, key);
-          const vb = getValue(b, key);
-          const cmp = typeof va === 'string' ? va.localeCompare(vb as string, 'pt-BR') : va - (vb as number);
-          return dir === 'asc' ? cmp : -cmp;
-        });
-      }
+      const { key, dir } = activeSort;
+      items.sort((a, b) => {
+        const va = getValue(a, key);
+        const vb = getValue(b, key);
+        const cmp = typeof va === 'string' ? va.localeCompare(vb as string, 'pt-BR') : va - (vb as number);
+        return dir === 'asc' ? cmp : -cmp;
+      });
       items.forEach((item) => list!.appendChild(item));
     }
 
     function updateButtonStates() {
       buttons.forEach((btn) => {
         btn.classList.remove('active-asc', 'active-desc');
-        if (activeSort && btn.dataset.sort === activeSort.key) {
+        if (btn.dataset.sort === activeSort.key) {
           btn.classList.add(activeSort.dir === 'asc' ? 'active-asc' : 'active-desc');
         }
       });
@@ -103,8 +98,8 @@ const accent = accentVar[section.accent];
     buttons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const key = btn.dataset.sort as SortKey;
-        if (activeSort && activeSort.key === key) {
-          activeSort = activeSort.dir === 'asc' ? { key, dir: 'desc' } : null;
+        if (activeSort.key === key) {
+          activeSort = activeSort.dir === 'asc' ? { key, dir: 'desc' } : DEFAULT_SORT;
         } else {
           activeSort = { key, dir: 'asc' };
         }
@@ -185,47 +180,13 @@ const accent = accentVar[section.accent];
     font-size: 1rem;
   }
 
-  .stats {
-    display: flex;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-  }
-
-  .stat {
-    background: var(--paper);
-    color: var(--ink);
-    border-color: var(--ink);
-    cursor: pointer;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-  }
-
-  .stat:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 var(--ink);
-  }
-
-  .stat:active {
-    transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0 0 var(--ink);
-  }
-
-  .sect.dark .stat {
-    background: transparent;
-    border-color: var(--paper);
-    color: var(--paper);
-    box-shadow: 4px 4px 0 0 var(--paper);
-  }
-
-  .sect.dark .stat:hover {
-    box-shadow: 6px 6px 0 0 var(--paper);
-  }
-
-  .sect.dark .stat:active {
-    box-shadow: 1px 1px 0 0 var(--paper);
-  }
-
-  .stat strong {
-    font-family: 'Archivo Black', sans-serif;
+  .stats-text {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.7;
   }
 
   .sort-bar {

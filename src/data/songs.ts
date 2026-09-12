@@ -49,6 +49,39 @@ export function keySortValue(key: string): number {
   return Number(num) * 2 + (letter === 'A' ? 0 : 1);
 }
 
+const CAMELOT_KEY_NAMES: Record<string, string> = {
+  '1A': 'Ab minor',
+  '1B': 'B major',
+  '2A': 'Eb minor',
+  '2B': 'F# major',
+  '3A': 'Bb minor',
+  '3B': 'Db major',
+  '4A': 'F minor',
+  '4B': 'Ab major',
+  '5A': 'C minor',
+  '5B': 'Eb major',
+  '6A': 'G minor',
+  '6B': 'Bb major',
+  '7A': 'D minor',
+  '7B': 'F major',
+  '8A': 'A minor',
+  '8B': 'C major',
+  '9A': 'E minor',
+  '9B': 'G major',
+  '10A': 'B minor',
+  '10B': 'D major',
+  '11A': 'F# minor',
+  '11B': 'A major',
+  '12A': 'Db minor',
+  '12B': 'E major',
+};
+
+// e.g. "F# minor (11A)"
+export function keyName(key: string): string {
+  const name = CAMELOT_KEY_NAMES[key];
+  return name ? `${name} (${key})` : key;
+}
+
 export function totalLength(songs: Song[]): string {
   const totalSeconds = songs.reduce((sum, s) => sum + toSeconds(s.length), 0);
   const min = Math.floor(totalSeconds / 60);
