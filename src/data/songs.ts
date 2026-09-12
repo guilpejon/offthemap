@@ -36,6 +36,32 @@ export function allSongs(): Song[] {
   return sections.flatMap((s) => s.songs);
 }
 
+export function slugify(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+export function songSlug(song: Song): string {
+  return slugify(`${song.artist}-${song.title}`);
+}
+
+export function uniqueSongs(): Song[] {
+  const seen = new Set<string>();
+  const result: Song[] = [];
+  for (const song of allSongs()) {
+    const key = songSlug(song);
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(song);
+    }
+  }
+  return result.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'));
+}
+
 export function artistCounts(): { artist: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const song of allSongs()) {
@@ -89,6 +115,7 @@ export const sections: Section[] = [
       { title: 'Subterranean Homesick Blues', artist: 'Red Hot Chili Peppers', length: '2:32' },
       { title: "Don't Forget Me", artist: 'Red Hot Chili Peppers', length: '4:35' },
       { title: 'Under the Bridge', artist: 'Red Hot Chili Peppers', length: '4:24' },
+      { title: 'Minor Thing', artist: 'Red Hot Chili Peppers', length: '3:01' },
       { title: 'Times Like These', artist: 'Foo Fighters', length: '4:38' },
       { title: 'Learn to Fly', artist: 'Foo Fighters', length: '3:54' },
       { title: 'These Days', artist: 'Foo Fighters', length: '5:26' },
@@ -97,6 +124,7 @@ export const sections: Section[] = [
       { title: 'Arlandria', artist: 'Foo Fighters', length: '4:20' },
       { title: 'Everlong', artist: 'Foo Fighters', length: '4:10' },
       { title: 'Rope', artist: 'Foo Fighters', length: '4:19' },
+      { title: 'My Hero', artist: 'Foo Fighters', length: '4:20' },
     ],
   },
   {

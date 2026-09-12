@@ -1,22 +1,19 @@
 ---
-import { sections } from '../data/songs';
-
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si=81e91246d96f48a1';
 ---
 
 <nav class="nav">
   <div class="wrap nav-inner">
-    <a class="brand" href="#top">Off The Map</a>
+    <a class="brand" href={`${base}/`}>Off The Map</a>
 
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Abrir menu">
       <span class="menu-icon" aria-hidden="true"></span>
     </button>
 
     <div class="nav-links" id="nav-links">
-      <a class="nav-link" href="#numeros">Números</a>
-      {sections.map((s) => (
-        <a class="nav-link" href={`#${s.id}`}>{s.title}</a>
-      ))}
+      <a class="nav-link" href={`${base}/ensaios/`}>Repertório</a>
+      <a class="nav-link" href={`${base}/songbook/`}>Songbook</a>
       <a class="playlist" href={playlistUrl} target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
           <path

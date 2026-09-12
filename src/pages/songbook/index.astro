@@ -1,0 +1,126 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { uniqueSongs, songSlug } from '../../data/songs';
+import { lyrics } from '../../data/lyrics';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const songs = uniqueSongs();
+---
+
+<Layout title="Off The Map — Songbook" description="Todas as letras do repertório da banda, uma por uma.">
+  <Nav />
+
+  <header class="hero">
+    <div class="wrap">
+      <p class="badge hard-sm" style="background: var(--lime);">Songbook</p>
+      <h1>Letras</h1>
+      <p class="subtitle">Todo o repertório, uma música por vez. Clique pra ver a letra.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <ul class="song-list hard">
+      {songs.map((song) => {
+        const slug = songSlug(song);
+        const hasLyrics = Boolean(lyrics[slug]);
+        return (
+          <li class="song-item">
+            {hasLyrics ? (
+              <a class="song-link" href={`${base}/songbook/${slug}/`}>
+                <span class="title">{song.title}</span>
+                <span class="artist">{song.artist}</span>
+              </a>
+            ) : (
+              <span class="song-link is-disabled" aria-disabled="true">
+                <span class="title">{song.title}</span>
+                <span class="artist">{song.artist}</span>
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .hero {
+    padding: 2.5rem 0 1.5rem;
+    background: var(--ink);
+    color: var(--paper);
+    border-bottom: var(--border-w) solid var(--pink);
+  }
+
+  .badge {
+    color: var(--ink);
+    margin-bottom: 0.9rem;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 7vw, 3.2rem);
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    opacity: 0.8;
+    max-width: 32rem;
+  }
+
+  main.wrap {
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  .song-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.3rem;
+    background: var(--paper);
+  }
+
+  .song-item + .song-item {
+    border-top: 2px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+  }
+
+  .song-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0.9rem;
+    text-decoration: none;
+    color: var(--ink);
+    transition: background 0.12s ease;
+  }
+
+  a.song-link:hover {
+    background: var(--sky);
+  }
+
+  .song-link.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .title {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .artist {
+    font-size: 0.82rem;
+    opacity: 0.65;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 520px) {
+    .song-link {
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+  }
+</style>

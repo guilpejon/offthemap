@@ -1,6 +1,7 @@
 ---
 import type { Song } from '../data/songs';
-import { spotifyLink } from '../data/songs';
+import { spotifyLink, songSlug } from '../data/songs';
+import { lyrics } from '../data/lyrics';
 
 interface Props {
   index: number;
@@ -9,10 +10,24 @@ interface Props {
 }
 
 const { index, song, accent } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const slug = songSlug(song);
+const hasLyrics = Boolean(lyrics[slug]);
 ---
 
 <li class="row">
-  <span class="num hard-sm" style={`background: ${accent};`}>{index}</span>
+  {hasLyrics ? (
+    <a
+      class="num hard-sm"
+      style={`background: ${accent};`}
+      href={`${base}/songbook/${slug}/`}
+      aria-label={`Ver letra de ${song.title}, de ${song.artist}`}
+    >
+      {index}
+    </a>
+  ) : (
+    <span class="num hard-sm" style={`background: ${accent};`}>{index}</span>
+  )}
   <span class="info">
     <span class="title">{song.title}</span>
     <span class="artist">{song.artist}</span>
@@ -51,6 +66,7 @@ const { index, song, accent } = Astro.props;
     font-family: 'Archivo Black', sans-serif;
     font-size: 0.85rem;
     color: var(--ink);
+    text-decoration: none;
     box-shadow: 3px 3px 0 0 var(--ink);
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
