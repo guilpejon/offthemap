@@ -1,3 +1,35 @@
+Riff
+E|---------------|
+B|---------------|
+G|-----------5---| x4
+D|-7--7--5/7-----|
+A|-5--5----------|
+E|---------------|
+
+Riff 2
+E|--------------------|
+B|--------------------|
+G|--------------------| x4
+D|-7-7-9-9-7-7-9-9----|
+A|-5-5-5-5-5-5-5-5----|
+E|--------------------|
+
+Riff 3
+E|--------------------|
+B|--------------------|
+G|--------------------| x2
+D|-2-2-4-4-2-2-4-4----|
+A|-0-0-0-0-0-0-0-0----|
+E|--------------------|
+
+Riff 4
+E|----|
+B|----|
+G|----|
+D|----|
+A|-5--|
+E|-3--|
+
 Shoot me (4x)
 Here come old flat top
 He come grooving up slowly
@@ -17,6 +49,7 @@ One thing I can tell you is you got to be
 free
 
 Chorus
+B5       A5   G5  A5
 Come together, right now, over me
 
 Shoot me (4x)
@@ -29,10 +62,12 @@ Hold you in his armchair you can feel
 his disease
 
 Chorus
+B5       A5   G5  A5
 Come together, right now, over me
 
 Shoot me
 Right!
+(solo)
 He roller coaster
 He got early warning
 He got muddy water
@@ -42,12 +77,13 @@ Got to be good looking 'cause he's so
 hard to see
 
 Chorus
+B5       A5   G5  A5
 Come together, right now, over me
 
 Shoot me (3x)
 Oh!
-Come together,               yeah
-Come together,        yeah
+Come together,               yeah
+Come together,        yeah
 Come together, yeahhh
 Come together, yeeeeeeeeah
 Come together, YEAH

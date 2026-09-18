@@ -16,14 +16,90 @@ const { song } = Astro.props;
 const text = lyrics[songSlug(song)];
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+// Chord token, e.g. E, Am, G/B, Bb7, Csus4, D#m7, A2, E5, D7M, D7(9) — used to detect chord/annotation lines.
+const CHORD_RE =
+  /^[A-G](#|b)?(maj7|maj9|maj|m7b5|m9|m7|m6|madd9|mMaj7|min7|min|dim7|dim|aug|sus4|sus2|sus|add9|add11|m|M|6\/9|6|7sus4|7|9|11|13|2|4|5)*(\(\d+\))?(\/[A-G](#|b)?)?$/;
+
+// Section/part labels — kept short so a stray lyric line can't false-match.
+const SECTION_RE =
+  /^(Intro|Verse|Chorus|Pre-?Chorus|Bridge|Outro|Riff(\s*\d+)?|Lick(\s*\d+)?|Interlude|Solo|Refr[aã]o|Ponte|Estrofe)\b.*$/i;
+
+// Try the raw token first (handles chords with internal parens, e.g. D7(9)) before
+// stripping outer wrapping parens (handles group notation, e.g. "(E" / "A)" from "(E G D A)").
+function isChordToken(tok: string) {
+  if (CHORD_RE.test(tok)) return true;
+  const clean = tok.replace(/^\(+/, '').replace(/[),.;]+$/, '');
+  return clean.length > 0 && CHORD_RE.test(clean);
+}
+
+function isAnnotationToken(tok: string) {
+  if (isChordToken(tok)) return true;
+  const clean = tok.replace(/^\(+/, '').replace(/[),.;]+$/, '');
+  if (!clean) return true;
+  if (/^\d+x?$/i.test(clean)) return true;
+  if (/^(OR|Lick|Riff)$/i.test(clean)) return true;
+  return false;
+}
+
+function isChordLine(trimmed: string) {
+  const tokens = trimmed.split(/\s+/);
+  const hasChord = tokens.some(isChordToken);
+  return hasChord && tokens.every(isAnnotationToken);
+}
+
+function classifyLine(line: string): { type: 'section' | 'chord' | 'tab' | 'lyric' | 'blank'; text: string } {
+  const trimmed = line.trim();
+  if (!trimmed) return { type: 'blank', text: line };
+  if (/^[eEADGB]?\|[-0-9x|/\\~^()hpb ]*\|?$/.test(trimmed)) return { type: 'tab', text: line };
+  if (trimmed.length <= 40 && SECTION_RE.test(trimmed)) return { type: 'section', text: line };
+  if (isChordLine(trimmed)) return { type: 'chord', text: line };
+  return { type: 'lyric', text: line };
+}
+
 function renderLyrics(raw: string) {
   const escape = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-  return raw
-    .split('\n')
-    .map((line) => (line.trim() === 'Chorus' ? '<strong class="section-label">Chorus</strong>' : escape(line)))
-    .join('\n');
+  const lines = raw.split('\n').map(classifyLine);
+
+  // A blank line right after a tab line (separating two tab blocks, or
+  // ending one) becomes a small dedicated gap instead of a full paragraph
+  // break — otherwise it inherits the lyrics block's larger line-height and
+  // looks like a much bigger gap than the tightly-packed tab rows around it.
+  type RenderType = 'section' | 'chord' | 'tab' | 'tab-gap' | 'lyric' | 'blank';
+  const types: RenderType[] = lines.map((l, i) =>
+    l.type === 'blank' && lines[i - 1]?.type === 'tab' ? 'tab-gap' : l.type
+  );
+
+  // Tab lines and tab gaps are block elements that already force their own
+  // line break — leaving the raw '\n' in would add an extra blank-line gap
+  // (it sits outside the span, so it renders at the parent's line-height).
+  return lines
+    .map(({ text }, i) => {
+      const type = types[i];
+      const escaped = escape(text);
+      let rendered: string;
+      switch (type) {
+        case 'section':
+          rendered = `<strong class="section-label">${escaped}</strong>`;
+          break;
+        case 'chord':
+          rendered = `<span class="chord-line">${escaped}</span>`;
+          break;
+        case 'tab':
+          rendered = `<span class="tab-line">${escaped}</span>`;
+          break;
+        case 'tab-gap':
+          rendered = `<span class="tab-gap"></span>`;
+          break;
+        default:
+          rendered = escaped;
+      }
+      const prevType = i > 0 ? types[i - 1] : null;
+      const separator = i === 0 || prevType === 'tab' || prevType === 'tab-gap' ? '' : '\n';
+      return separator + rendered;
+    })
+    .join('');
 }
 
 const lyricsHtml = renderLyrics(text);
@@ -106,5 +182,28 @@ const lyricsHtml = renderLyrics(text);
     letter-spacing: 0.05em;
     font-size: 0.85rem;
     opacity: 0.6;
+  }
+
+  .lyrics :global(.chord-line) {
+    display: inline-block;
+    font-weight: 700;
+    color: var(--pink);
+  }
+
+  .lyrics :global(.tab-line) {
+    display: block;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--periwinkle) 12%, transparent);
+    border-left: 3px solid var(--periwinkle);
+    padding: 0 0.5rem;
+    margin-left: -0.5rem;
+    width: fit-content;
+  }
+
+  .lyrics :global(.tab-gap) {
+    display: block;
+    height: 0.6rem;
   }
 </style>

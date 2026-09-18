@@ -1,3 +1,10 @@
+Intro
+Riff 1
+D|-----11----11----0-----0---|
+A|--0-----0------12----12----|
+E|-12--12--12--12--12--12--12|
+
+(Riff 1)
 One of these days, the ground will drop out
 from beneath your feet
 One of these days, your heart will stop and
@@ -8,20 +15,35 @@ One of these days, their bombs will drop
 and silence everything
 
 Chorus
+C          G
 But it's alright
+D          A
 Yeah, it's alright
+C            G
 I said it's alright
 
+A
 Easy for you to say
+        Em
 Your heart has never been broken
+       C
 Your pride has never been stolen
+    D
 Not yet, not yet
+    A
 One of these days
+       Em
 I bet your heart'll be broken
+       C
 I bet your pride'll be stolen
+    D
 I'll bet, I'll bet, I'll bet, I'll bet
+A  D
+One of these days
+A  D
 One of these days
 
+(Riff 1)
 One of these days
 One of these days, your eyes will close and
 pain will disappear
@@ -29,17 +51,30 @@ One of these days, you will forget to hope
 and learn to fear
 
 Chorus
+C          G
 But it's alright
+D          A
 Yeah, it's alright
+C            G
 I said it's alright
+D          A
 Yeah, it's alright
+C           G
 Don't say it's alright
+D          A
 Don't say it's alright
+C            G
 Don’t say it’s alright
 
+(Riff 1)
 One of these days, your heart will stop and
 play its' final beat
-Riff 2 (só começo) G
+Riff 2 (start only, then G)
+G|--0-------------|
+D|----2--2--2--0--|
+A|-3----3----3--2--|
 But it's alright
+
+A  D
 One of these days
-A  D(só uma)
+A  D (once)

@@ -21,12 +21,24 @@ const songs = uniqueSongs();
   </header>
 
   <main class="wrap">
-    <ul class="song-list hard">
+    <div class="search-box">
+      <input
+        type="search"
+        id="song-search"
+        class="search-input"
+        placeholder="Buscar por música ou banda..."
+        autocomplete="off"
+      />
+    </div>
+
+    <p class="no-results" id="no-results" hidden>Nenhuma música encontrada.</p>
+
+    <ul class="song-list hard" id="song-list">
       {songs.map((song) => {
         const slug = songSlug(song);
         const hasLyrics = Boolean(lyrics[slug]);
         return (
-          <li class="song-item">
+          <li class="song-item" data-title={song.title.toLowerCase()} data-artist={song.artist.toLowerCase()}>
             {hasLyrics ? (
               <a class="song-link" href={`${base}/songbook/${slug}/`}>
                 <span class="title">{song.title}</span>
@@ -46,6 +58,28 @@ const songs = uniqueSongs();
 
   <Footer />
 </Layout>
+
+<script>
+  const input = document.getElementById('song-search') as HTMLInputElement | null;
+  const items = Array.from(document.querySelectorAll<HTMLLIElement>('#song-list .song-item'));
+  const noResults = document.getElementById('no-results');
+
+  input?.addEventListener('input', () => {
+    const query = input.value.trim().toLowerCase();
+    let visibleCount = 0;
+
+    items.forEach((item) => {
+      const matches =
+        !query ||
+        (item.dataset.title ?? '').includes(query) ||
+        (item.dataset.artist ?? '').includes(query);
+      item.hidden = !matches;
+      if (matches) visibleCount += 1;
+    });
+
+    if (noResults) noResults.hidden = visibleCount > 0;
+  });
+</script>
 
 <style>
   .hero {
@@ -75,6 +109,36 @@ const songs = uniqueSongs();
     padding: 2rem 1.5rem 3rem;
   }
 
+  .search-box {
+    margin-bottom: 1.2rem;
+  }
+
+  .search-input {
+    width: 100%;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1rem;
+    padding: 0.75rem 0.9rem;
+    background: var(--paper);
+    color: var(--ink);
+    border: var(--border-w) solid var(--ink);
+    border-radius: 8px;
+  }
+
+  .search-input::placeholder {
+    color: color-mix(in srgb, var(--ink) 45%, transparent);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--pink);
+  }
+
+  .no-results {
+    padding: 0.9rem;
+    font-size: 0.9rem;
+    opacity: 0.65;
+  }
+
   .song-list {
     list-style: none;
     margin: 0;
@@ -82,7 +146,11 @@ const songs = uniqueSongs();
     background: var(--paper);
   }
 
-  .song-item + .song-item {
+  /* General sibling (~), not adjacent (+): a visible item only gets the
+     separator if SOME earlier item is also visible, no matter how many
+     hidden (filtered-out) items sit between them. This keeps it at exactly
+     one separator per gap between visible results while searching. */
+  .song-item:not([hidden]) ~ .song-item:not([hidden]) {
     border-top: 2px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   }
 

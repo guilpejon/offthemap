@@ -1,3 +1,8 @@
+Intro
+D|-----6-4~-6------------6-4~----------6-4~-6-----------6-4~6----|
+A|-4-7--------4\----4-7------7-4--4-7--------4\----4-7--------7b-|
+E|-------------------------------------------------------------------|
+
 Ain't that the way it always starts
 A simple round of conversation
 Became a shameful equation
@@ -10,20 +15,31 @@ Don't make a sound
 
 Shame, shame go away
 Come again some other day
+C#5                    A5
 You used to say I couldn't save you
 enough
+         E5
 So I've been saving it up
+       B5       F#5
 I started saving it up
+C#5                     A5
 And when you said I couldn't give you
 enough
+       E5
 I started giving you up
+       B5      C5
 I started giving you up
 
 Chorus
+C#5            F#5
 You are not me
+       A5        B5 C5
 Arlandria,    Arlandria
+ C#5           F#5
 You and what army?
+       A5        B5
 Arlandria,    Arlandria
+        C5
 Oh God, you gotta make it stop
 
 Chase, all of those memories away
@@ -38,10 +54,16 @@ Let me be your hand-me-down
 Fame, fame go away
 Come again some other day
 
+Bridge
+C#5        A5       E5
 My sweet Virginia
+    B5        F#5     C#5
 I'm the same as I was in your arms
+   A5         E5
 My sweet Virginia
+     B5      C5       C#5
 I'm the same as I was in your heart
+(x2, through next verse)
 
 Shame, shame go away
 Come again some other day
@@ -62,7 +84,14 @@ Let me be your hand-me-down
 Fame, fame go away
 Come again some other day
 
+Bridge
 My sweet Virginia
 Oh God, you gotta make it stop
 My sweet Virginia
 Oh God, you gotta make it stop
+
+Outro
+G|-4-----4----------------4-----4------------|
+D|-2-----2-----2-----4-----2-----2-----2-----4-|
+A|-4-0-4-0----2-----4----4-0-4-0----2-----4-|
+E|-----------0-0-0-2----------------0-0-4-2-|

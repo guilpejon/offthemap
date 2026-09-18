@@ -1,7 +1,6 @@
 // Each song's lyrics live in its own plain-text file under ./lyrics/<slug>.txt
 // (real line breaks, easy to open and edit) rather than as a giant one-line
-// string here. A few songs have no source lyrics yet (Foo Fighters - Rope,
-// Incubus - Echo) and a handful retain minor PDF layout
+// string here. A handful retain minor PDF layout
 // artifacts where two text columns overlapped — see slugs
 // red-hot-chili-peppers-dani-california,
 // red-hot-chili-peppers-subterranean-homesick-blues,

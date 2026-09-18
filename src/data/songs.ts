@@ -201,7 +201,6 @@ export const sections: Section[] = [
       { title: 'Alive', artist: 'Pearl Jam', length: '5:41', bpm: 99, key: '1B' },
       { title: 'Black', artist: 'Pearl Jam', length: '5:43', bpm: 86, key: '9A' },
       { title: 'Anna Molly', artist: 'Incubus', length: '3:46', bpm: 152, key: '5A' },
-      { title: 'Echo', artist: 'Incubus', length: '3:34', bpm: 135, key: '10B' },
     ],
   },
   {

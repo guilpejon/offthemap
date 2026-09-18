@@ -1,16 +1,31 @@
+Intro
+E|---5----5----|
+B|---5----5----|
+G|---6----7----|
+D|---7----7----|
+A|---0---------|
+E|-------------|
+then F  C
+
 SOn, she said, have I got a little story for you
 What you thought was your daddy.. was
 nothing but a–
 WHILE you were sittin' home alone at age
 thirteen
 Your real daddy was dyin'
+            F     C             F
 Sorry you didn't see him, but I'm.. glAd we
+C
 talked
 
 Chorus
+E G          D           A
 Oh I... ooooh, I'm still alive
+ E G        D           A
 Hey, I, ooooh, I'm still alive
+E G         D           A
 Hey I, ooooh, I'm still alive
+Riff (4x)
 Hey...oh…
 
 while she walks slowly | across a young man's
@@ -19,19 +34,25 @@ She said, I'm ready | for youu
 WHY I can't remember.. anything to this very
 day
 'Cept the looook | the loook
+   F              C       F          C
 Oh, you know where, now I can't seeeee I just
 stare
 
 Chorus
+E G         D      A
 I I... I, I'm still alive
+ E G       D      A
 Hey, I, ooooh, I'm still alive
+E G      D        A
 Hey I, ooooh, I'm still alive
+E G      D        A
 Hey I, ooooh, I'm still alive, yeah
+Riff 2 (4x)
 
 Verse (pausado)
 Is something wrong she saaid | of course there
 is
-(pausado ++tom)Verse
+Verse (pausado, +tom)
 You're still alive, she said.. oh, and do I deserve
 to be?
 Is that the question?
@@ -39,12 +60,41 @@ And if so, if so who answeeers?
 Who answeeeeers?
 
 Chorus
+E   G       D        A
 I... ooooh, I'm still alive
+ E  G       D       A
 Hey, I, ooooh, I'm still alive
+E   G       D        A
 Hey I, ooooh, I'm still alive
-Hey I, uhhhhh, I'm still alive (yeah (5x))
+E   G       D        A
+Hey I, uhhhhh, I'm still alive (yeah 5x)
 
+(E G D A) 18x
 OR
 4x Lick 1 + 2x Lick 2 + (E G D A) 13x
+
+Riff
+E|---------|
+B|---12----|
+G|---11----|
+D|----9----|
+A|---------|
+E|---------|
+
+Riff 2
+E|-----------------------------------------|
+B|---12------12-----------------------------|
+G|---11(x4)--11(x4)--------11----------------|
+D|----9------9--------------11----------------|
+A|--------------------------9-----9-----------|
+E|-------------11-----------9-----9-----------|
+
 Lick 1
+|-9-7-9-8/10\8-7-7-7-5/5-|
+|-9-7-9-0------7-7-7-6---|
+|-9-7-9-9/11\9-7-7-7--7--|
+|-7----10/12\10----------|
+
 Lick 2
+|-12-11-9-| x8
+|-10-11-9-| x8
