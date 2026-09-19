@@ -36,7 +36,7 @@ function isAnnotationToken(tok: string) {
   if (isChordToken(tok)) return true;
   const clean = tok.replace(/^\(+/, '').replace(/[),.;]+$/, '');
   if (!clean) return true;
-  if (/^\d+x?$/i.test(clean)) return true;
+  if (/^(\d+x?|x\d+)$/i.test(clean)) return true;
   if (/^(OR|Lick|Riff)$/i.test(clean)) return true;
   return false;
 }
@@ -186,12 +186,14 @@ const lyricsHtml = renderLyrics(text);
 
   .lyrics :global(.chord-line) {
     display: inline-block;
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     font-weight: 700;
     color: var(--pink);
   }
 
   .lyrics :global(.tab-line) {
     display: block;
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     font-size: 0.85rem;
     line-height: 1.4;
     color: var(--ink);

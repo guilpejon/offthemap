@@ -1,34 +1,33 @@
 Intro
+e|-----------------------------------|
+B|------3---------3-----3---------3--|
+G|----4---4-----4-----4---4-----4----|
+D|--4-------4-2-----0-------0-2------|
+A|-----------------------------------|
 E|-----------------------------------|
-B|------3----------3-----3---------3-|
-G|----4---4-----4-----4---4-----4---|
-D|--4-------4-2-----0--------0-2-----|
-A|------------------------------------|
-E|------------------------------------|
 
 Verse (riff under vocals, 2x)
-E|---------------------------------|
-B|-------------------------------2-|
-G|------4---------------4-----2-|
-D|------------2-------------------|
-A|--2----2-0-0--0---------0---|
-E|-----------------3----3-----|
-E|-----------------------------------|
-B|-----------------------------------|
-G|-------4---------------4-----------|
-D|-------------2---------------2-2-2-2-|
-A|-0-2----2-0-0--0---------2-2-2-2-|
-E|-------------------3----3--0-0-0-0-|
+E|-----------------------------|
+B|--------------------------2--|
+G|----4--------------4------2--|
+D|----------2------------------|
+A|--2---2-0-0--0----------0----|
+E|-----------------3---3-------|
+
+E|-------------------------------|
+B|-------------------------------|
+G|----4--------------4-----------|
+D|----------2-------------2-2-2-2|
+A|0-2---2-0-0--0----------2-2-2-2|
+E|-----------------3---3--0-0-0-0|
 
 You got away, got away, got away from me
 Now get away, get away, get away from me
 I couldn't grow just living in the shadow
-Where do you go when no one's following
-you?
+Where do you go when no one's following you?
 You ran away, ran away it was right on cue
 Bm     A     Bm      A    Bm      A Bm
-Should I go on, and on, and on, and on, and
-on, and on again
+Should I go on, and on, and on, and on, and on, and on again
 
 Chorus
   G           A        Bm
@@ -49,10 +48,8 @@ Dear Rosemary
 Dear Rosemary
 
 Verse
-You've got a way, got a way, got a way with
-things
-You got away, got away, got away with
-things
+You've got a way, got a way, got a way with things
+You got away, got away, got away with things
 
 False starts, young hearts get shattered
 Pick up the pieces coming down around you
@@ -61,7 +58,8 @@ Bm     A     Bm      A    Bm      A Bm
 Can I go on, and on, and on
 And on, and on, and on again?
 
-Bridge
+Bridge 
+(Bm A G Em)
 This was no ordinary life
 (This was no ordinary life)
 This was no ordinary life
@@ -84,6 +82,8 @@ Dear Rosemary (Dear Rosemary)
      Bm A        G Em
 Please pardon me (Please pardon me)
 
-Outro (instrumental, guitar)
+(Verse 1x)
+
+Outro 
 You got away, got away, got away from me
 Now get away, get away, get away from me

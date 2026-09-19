@@ -64,15 +64,18 @@ const songs = uniqueSongs();
   const items = Array.from(document.querySelectorAll<HTMLLIElement>('#song-list .song-item'));
   const noResults = document.getElementById('no-results');
 
+  // Strip diacritics so "zoio" matches "zóio" and vice versa.
+  const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+
   input?.addEventListener('input', () => {
-    const query = input.value.trim().toLowerCase();
+    const query = normalize(input.value.trim().toLowerCase());
     let visibleCount = 0;
 
     items.forEach((item) => {
       const matches =
         !query ||
-        (item.dataset.title ?? '').includes(query) ||
-        (item.dataset.artist ?? '').includes(query);
+        normalize(item.dataset.title ?? '').includes(query) ||
+        normalize(item.dataset.artist ?? '').includes(query);
       item.hidden = !matches;
       if (matches) visibleCount += 1;
     });

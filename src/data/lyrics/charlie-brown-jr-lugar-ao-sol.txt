@@ -34,7 +34,6 @@ F#m9            D5
 Livre pra poder buscar
     A7M    A9  D5  F
 O meu lugar ao sol
-
 A7M             A9
 Livre pra poder sorrir, sim
 F#m9            D5
@@ -53,6 +52,7 @@ Eu sei foi até melhor
     D7M
 Irmãos do mesmo Cristo
 Eu quero e não desisto
+
    F#m
 Caro Pai
            E5
@@ -65,8 +65,6 @@ Não estou sozinho
 Eu sei se eu tiver fé
       E5      D7M
 Eu volto até a sonhar
-
-Refrão
   F#m    E5
 O amor é assim
    D7M
