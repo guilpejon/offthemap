@@ -7,6 +7,7 @@ interface Props {
 }
 
 const { title, description = 'Off The Map — repertório da banda, ensaio por ensaio.' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <!doctype html>
@@ -14,7 +15,7 @@ const { title, description = 'Off The Map — repertório da banda, ensaio por e
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,8 +24,24 @@ const { title, description = 'Off The Map — repertório da banda, ensaio por e
       href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <link rel="manifest" href={`${base}/manifest.webmanifest`} />
+    <meta name="theme-color" content="#14142b" />
+    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Off The Map" />
   </head>
   <body>
     <slot />
+    <script is:inline define:vars={{ base }}>
+      // sw.js only exists in the built site (generated post-build), not in
+      // `astro dev` — swallow the 404 there instead of an unhandled rejection.
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}/sw.js`).catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

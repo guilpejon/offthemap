@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/generate-sw.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "fetch:spotify": "node --env-file=.env scripts/fetch-spotify-data.mjs"
