@@ -1,32 +1,42 @@
 Intro
 Riff 1
-D|-----11----11----0-----0---|
-A|--0-----0------12----12----|
-E|-12--12--12--12--12--12--12|
+D|------11---------11----------0----------0----|
+A|--0---------0----------12----------12--------|
+E|----12---12---12----12----12----12----12---12|
 
 (Riff 1)
 One of these days, the ground will drop out
 from beneath your feet
 One of these days, your heart will stop and
 play its final beat
+
 One of these days, the clocks will stop and
 time won't mean a thing
 One of these days, their bombs will drop
 and silence everything
 
+Riff 2
+G|----------0--------------------------------------0-----------|
+D|----2-------2-----2-----------0-------------4--------4-----4-|
+A|-3-----3--------3-------2--------2----2---5----5--------5----|
+E|---------------------3-----3--------3------------------------|
+
+G|----------------------------0------------3-|
+D|---------0-------------2--------2----2---0-|
+A|---4--------4----4--3----3---------3-----2-|
+E|-5----5--------5-------------------------3-|
+
 Chorus
-C          G
+(Riff 2)
 But it's alright
-D          A
 Yeah, it's alright
-C            G
 I said it's alright
 
-A
+                 A
 Easy for you to say
-        Em
+                    Em
 Your heart has never been broken
-       C
+                   C
 Your pride has never been stolen
     D
 Not yet, not yet
@@ -38,9 +48,9 @@ I bet your heart'll be broken
 I bet your pride'll be stolen
     D
 I'll bet, I'll bet, I'll bet, I'll bet
-A  D
+    A(x7765x) D(xx775x)
 One of these days
-A  D
+    A  D
 One of these days
 
 (Riff 1)
@@ -51,6 +61,33 @@ One of these days, you will forget to hope
 and learn to fear
 
 Chorus
+(Riff 2)
+But it's alright
+Yeah, it's alright
+I said it's alright
+
+                 A
+Easy for you to say
+                    Em
+Your heart has never been broken
+                   C
+Your pride has never been stolen
+    D
+Not yet, not yet
+    A
+One of these days
+       Em
+I bet your heart'll be broken
+       C
+I bet your pride'll be stolen
+    D
+I'll bet, I'll bet, I'll bet, I'll bet
+    A(x7765x) D(xx775x)
+One of these days
+    A  D
+One of these days
+
+Bridge
 C          G
 But it's alright
 D          A
@@ -66,15 +103,35 @@ Don't say it's alright
 C            G
 Don’t say it’s alright
 
+(Riff 1) 2x
+
 (Riff 1)
 One of these days, your heart will stop and
 play its' final beat
-Riff 2 (start only, then G)
-G|--0-------------|
-D|----2--2--2--0--|
-A|-3----3----3--2--|
+(Riff 2 - metade)
 But it's alright
 
-A  D
+Chorus
+                 A
+Easy for you to say
+                    Em
+Your heart has never been broken
+                   C
+Your pride has never been stolen
+    D
+Not yet, not yet
+    A
 One of these days
-A  D (once)
+       Em
+I bet your heart'll be broken
+       C
+I bet your pride'll be stolen
+    D
+I'll bet, I'll bet, I'll bet, I'll bet
+    A(x7765x) D(xx775x)
+One of these days
+    A  D
+One of these days
+    A  D
+One of these days
+     A  D (once)

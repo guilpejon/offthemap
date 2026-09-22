@@ -1,7 +1,32 @@
+Intro
+G|----------------------------------------------------9-|
+D|--------------------------------------------------9-9-|
+A|--7-7---7-9-10-9-7---10-12-7-----5-------5---3--7-7-7-|
+E|--0----------------------------3---0---3---1----------|
+
+Riff 1
+B|-8-----9---9-7--9---7---9-|
+--7-7-7-7-7-7-7-7-7-7-7-------7-7-7-7-|
+
+Riff 2
+G|-9---9---9---9-x9-90-|-9---9---9---9-x9-90-|
+D|-7---7---7---7-x7-70-|-7---7---7---7-x7-70-|
+
+Riff 3
+G|-7---7---7---7-x7-76-|-9---9---9---9-x9-90-|
+D|-5---5---5---5-x5----|-7---7---7---7-x7-70-|
+
+Riff 4
+G|-x5----x5--------x7----x7-|
+D|-x5----x5--------x7----x7-|
+A|-x5----x5--------x7----x7-|
+
+Intro
 So if you're lonely
 You know I'm here waiting for you
 I'm just a cross-hair
 I'm just a shot away from you
+
 And if you leave here
 You leave me broken, shattered I lie
 I'm just a cross-hair
@@ -11,12 +36,15 @@ I know I won't be leaving here
 With you
 
 Chorus
+[Break][Riff 2x][Verse] 
 I say, "Don't you know?"
 You say, "You don't know"
 I say
 "Take me out"
 I say, "You don't show"
 Don't move, time is slow
+
+[Riff][Verse] 
 I say
 "Take me out
 I say, "You don't know"
@@ -28,6 +56,7 @@ If eyes move, this could die
 I want you
 To take me out
 
+[Break][Chorus]
 I know, I won't be leaving here
 (with you)
 Oh, I know I won't be leaving
@@ -38,23 +67,27 @@ I know, I won't be leaving here
 With you
 
 Chorus
+[Riff][Verse]
 I say, "Don't you know?"
 You say, "You don't know"
 I say
 "Take me out”
+
 If I wane, this could die
 If I wait, this could die
 I want you
 To take me out
+
 If I move, this could die
 Eyes move, this can die
 Come on
 Take me out
 
-I know, I won't be leaving here (with
-you)
+[Riff][Break][Chorus] 
+I know, I won't be leaving here (with you)
 Oh, I know I won't be leaving here
-I know, I won't be leaving here (with
-you)
-I know, I won't be leaving here
+I know, I won't be leaving here (with you)
+I know, I won't be leaving here 
 With you
+
+[Break] - Final 07xxxx 

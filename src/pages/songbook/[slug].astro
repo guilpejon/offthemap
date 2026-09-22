@@ -37,7 +37,7 @@ function isAnnotationToken(tok: string) {
   const clean = tok.replace(/^\(+/, '').replace(/[),.;]+$/, '');
   if (!clean) return true;
   if (/^(\d+x?|x\d+)$/i.test(clean)) return true;
-  if (/^(OR|Lick|Riff)$/i.test(clean)) return true;
+  if (/^(OR|Lick|Riff|to|the)$/i.test(clean)) return true;
   return false;
 }
 
