@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
-import { uniqueSongs, songSlug } from '../../data/songs';
+import { uniqueSongs, songSlug, toSeconds, keySortValue } from '../../data/songs';
 import { lyrics } from '../../data/lyrics';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -33,12 +33,26 @@ const songs = uniqueSongs();
 
     <p class="no-results" id="no-results" hidden>Nenhuma música encontrada.</p>
 
+    <div class="sort-bar" role="group" aria-label="Ordenar músicas">
+      <button type="button" class="badge hard-sm sort-btn active-asc" data-sort="alpha">A-Z</button>
+      <button type="button" class="badge hard-sm sort-btn" data-sort="length">Duração</button>
+      <button type="button" class="badge hard-sm sort-btn" data-sort="bpm">BPM</button>
+      <button type="button" class="badge hard-sm sort-btn" data-sort="key">Tom</button>
+    </div>
+
     <ul class="song-list hard" id="song-list">
       {songs.map((song) => {
         const slug = songSlug(song);
         const hasLyrics = Boolean(lyrics[slug]);
         return (
-          <li class="song-item" data-title={song.title.toLowerCase()} data-artist={song.artist.toLowerCase()}>
+          <li
+            class="song-item"
+            data-title={song.title.toLowerCase()}
+            data-artist={song.artist.toLowerCase()}
+            data-length-seconds={toSeconds(song.length)}
+            data-bpm={song.bpm}
+            data-key-sort={keySortValue(song.key)}
+          >
             {hasLyrics ? (
               <a class="song-link" href={`${base}/songbook/${slug}/`}>
                 <span class="title">{song.title}</span>
@@ -82,6 +96,63 @@ const songs = uniqueSongs();
 
     if (noResults) noResults.hidden = visibleCount > 0;
   });
+
+  type SortKey = 'alpha' | 'length' | 'bpm' | 'key';
+  type SortState = { key: SortKey; dir: 'asc' | 'desc' };
+
+  const DEFAULT_SORT: SortState = { key: 'alpha', dir: 'asc' };
+
+  function getValue(row: HTMLElement, key: SortKey): string | number {
+    switch (key) {
+      case 'alpha':
+        return row.dataset.title ?? '';
+      case 'length':
+        return Number(row.dataset.lengthSeconds);
+      case 'bpm':
+        return Number(row.dataset.bpm);
+      case 'key':
+        return Number(row.dataset.keySort);
+    }
+  }
+
+  const list = document.getElementById('song-list');
+  const sortButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.sort-btn'));
+  let activeSort: SortState = DEFAULT_SORT;
+
+  function applySort() {
+    if (!list) return;
+    const rows = Array.from(list.children) as HTMLElement[];
+    const { key, dir } = activeSort;
+    rows.sort((a, b) => {
+      const va = getValue(a, key);
+      const vb = getValue(b, key);
+      const cmp = typeof va === 'string' ? va.localeCompare(vb as string, 'pt-BR') : va - (vb as number);
+      return dir === 'asc' ? cmp : -cmp;
+    });
+    rows.forEach((row) => list.appendChild(row));
+  }
+
+  function updateButtonStates() {
+    sortButtons.forEach((btn) => {
+      btn.classList.remove('active-asc', 'active-desc');
+      if (btn.dataset.sort === activeSort.key) {
+        btn.classList.add(activeSort.dir === 'asc' ? 'active-asc' : 'active-desc');
+      }
+    });
+  }
+
+  sortButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.sort as SortKey;
+      if (activeSort.key === key) {
+        activeSort = activeSort.dir === 'asc' ? { key, dir: 'desc' } : DEFAULT_SORT;
+      } else {
+        activeSort = { key, dir: 'asc' };
+      }
+      applySort();
+      updateButtonStates();
+    });
+  });
 </script>
 
 <style>
@@ -114,6 +185,42 @@ const songs = uniqueSongs();
 
   .search-box {
     margin-bottom: 1.2rem;
+  }
+
+  .sort-bar {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+  }
+
+  .sort-btn {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--ink);
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, color 0.12s ease;
+  }
+
+  .sort-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+
+  .sort-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 var(--ink);
+  }
+
+  .sort-btn.active-asc {
+    background: var(--pink);
+    color: var(--ink);
+  }
+
+  .sort-btn.active-desc {
+    background: var(--ink);
+    color: var(--paper);
   }
 
   .search-input {
