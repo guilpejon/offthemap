@@ -1,33 +1,92 @@
+Riff (delay)
+B|-5-|-12-|--8-|--8-|
+G|-7-|-14-|-10-|-10-|
+D|-7-|-14-|-10-|-10-|
+
+Riff (main)
+D|---------------|---------------|-----------7---|-------------------------|
+A|-------7~--5-0-|------------5--|-9-9-9-9-9---9-|----------------------(0)|
+E|-7-5-0---------|-7--7-7-7-7--7-|---------------|-10--10-10-10-10-8-10----|
+
+Riff (ending)
+G|-10--10-10-10-10-9--10-|-10--10-10-10-10-|---------------|
+D|-----------------------|-----------------|---------------|
+A|-8---8--8--8--8--7--8--|-8---8--8--8--8--|-------7~--5-0-|
+E|-----------------------|-----------------|-7-5-0---------|
+
+Chorus (ending)
+D|-5-5-5-5-5~-5-5-|-6-6-6-6-6~-6-6-|-7-7-7-7-7~-7-7-|-8-8-8-8-8~-8-8/-|
+A|-5-5-5-5-5~-5-5-|-7-7-7-7-7~-7-7-|-7-7-7-7-7~-7-7-|-9-9-9-9-9~-9-9/-|
+E|-3-3-3-3-3~-3-3-|-4-4-4-4-4~-4-4-|-5-5-5-5-5~-5-5-|-6-6-6-6-6~-6-6/-|
+
+Interlude
+D|-4--4-4-4-4-4--6--7-|-7--7-7-7-7-7--9--10-|10-10-10-10-10--12--14-|
+A|--------------------|---------------------|-----------------------|
+E|-2--2-2-2-2-2--4--5-|-5--5-5-5-5-5--7--8--|-8--8-8-8-8-8---10--12-|
+
+D|14--14-14-14-14-14--14---|
+A|-----------------------0-|
+E|12--12-12-12-12-12--12---|
+
+D|-4--4-4-4-4-4--6--7-|-7--7-7-7-7-7--9--10-|10-10-10-10-10--17--14-|
+A|--------------------|---------------------|-----------------------|
+E|-2--2-2-2-2-2--4--5-|-5--5-5-5-5-5--7--8--|-8--8-8-8-8-8---15--12-|
+
+D|14--14-14-14-14---------------|
+A|-----------------------7~-5-0-|
+E|12--12-12-12-12--7-5-0--------|
+
 Verse
 This indecision got me climbing up the wall
 Been cheating gravity and waiting on the fall
 How did this come over me? I thought I was above it all
 Our hopes gone up in smoke, swallow your crown
 
-Chorus
+Chorus (Riff)
 Choke, on a kiss, I thought I'd save my breath for you
 Choke, on a kiss, I thought I'd save my breath for you
+G                     Em          Bm          A
 Give me some rope I'm coming loose, I'm hanging on you
+G                     Em          Bm          A
 Give me some rope I'm coming loose, I'm pulling for you now
-Give me some rope I'm coming, out of my head, into the clear when you, go,
-I, go, noose
+G                     Em           Bm         A
+Give me some rope I'm coming, out of my head, into the clear when you,
+Chorus (ending)
+go, I, go, noose
+
+Interlude
 
 Verse
 These premonitions got me crying up a storm
 Leave your condition, this position does no harm
 
-Chorus
+Chorus (Riff)
 Choke, on a kiss, I thought I'd save my breath for you
 Choke, on a kiss, I thought I'd save my breath for you
+G                     Em          Bm          A
 Give me some rope I'm coming loose, I'm hanging on you
+G                     Em          Bm          A
 Give me some rope I'm coming loose, I'm pulling for you now
-Give me some rope I'm coming, out of my head, into the clear when you, go,
-I, go, noose
+G                     Em           Bm         A
+Give me some rope I'm coming, out of my head, into the clear when you,
+Chorus (ending)
+go, I, go, noose
 
 Outro
+D|-------7~-9-|-------------2-|
+A|-9-7-9-5~-7-|-5--5---7--2-2-|
+E|-7-5-7------|-3--3---5--0-0-|
+
+G                     Em          Bm          A
 Give me some rope I'm coming loose, I'm hanging on you
+G                     Em          Bm          A
 Give me some rope I'm coming loose, I'm pulling for you now
+G                     Em           Bm         A
 Give me some hope I'm coming through, I'm coming out, yeah
-Give me some rope, I'm coming out of my head, into the clear when you go,
-I go, go
-Loose
+G                     Em           Bm         A
+Give me some rope I'm coming, out of my head, into the clear when you,
+Chorus (ending)
+go, I, go, loose
+
+Riff (delay)
+Riff (main)

@@ -1,52 +1,66 @@
 Intro
-e|---------------------------0-------------|
-B|---------------------------0-------------|
-G|---------6-6--------6-----0---------------|
-D|---6-6---6-6---4-4--6--6-----------------|
-A|---6-6---4-4---4-4--4--6-----------------|
-E|---4-4-0----0--2-2-----4-----------------|
+e|------------------------------|
+B|------------------------------|
+G|---------6-6--------6---------|
+D|---6-6---6-6---4-4--6--6--4---|
+A|---6-6---4-4---4-4--4--6--4---|
+E|---4-4-0----0--2-2-----4--2---|
 
-e|-----------------------------------------|
-B|-----------------------------------------|
-G|---------6-6--------6---------------------|
-D|---6-6---6-6---4-4--6--6--4---------------|
-A|---6-6---4-4---4-4--4--6--4---------------|
-E|---4-4-0----0--2-2-----4--2---------------|
+e|---------------------------0--|
+B|---------------------------0--|
+G|---------6-6--------6------0--|
+D|---6-6---6-6---4-4--6--6------|
+A|---6-6---4-4---4-4--4--6------|
+E|---4-4-0----0--2-2-----4------|
 
 Don’t wanna be an American idiot
-Don't want a nation under the new
-media
-And can you hear the sound of
-hysteria?
+Don't want a nation under the new media
+And can you hear the sound of hysteria?
 The subliminal mindfuck America
 
 Chorus
+C#5
 Welcome to a new kind of tension
+G#5                      D#5
 All across the alien nation
-Where everything isn't meant to be
-okay
+                                    G#5
+Where everything isn't meant to be okay
+C#5
 In television dreams of tomorrow
-We're not the ones who're meant
-to follow
+G#5                      D#5
+We're not the ones who're meant to follow
 For that's enough to argue
 
-Well, maybe I'm the faggot,
-America
+Well, maybe I'm the faggot, America
 I'm not a part of a redneck agenda
-Now everybody, do the
-propaganda
-And sing along to the age of
-paranoia
+Now everybody, do the propaganda
+And sing along to the age of paranoia
 
 Chorus
 Welcome to a new kind of tension
 All across the alien nation
-Where everything isn't meant to be
-okay
+Where everything isn't meant to be okay
 In television dreams of tomorrow
-We're not the ones who're meant
-to follow
+We're not the ones who're meant to follow
 For that's enough to argue
+
+[1x pausa - 4x verse - 2x chorus - 2x verse]
+
+B|-----------------------|---------------|------------------|-----------|
+G|-10--10-10-10-10-10-10-|-10---10-8---6-|/8---8-8-8-8-8/10-|-8---6---5-|
+D|-x---x--x--x--x--x--x--|-x----x--x---x-|-x---x-x-x-x-x-x--|-x---x---x-|
+A|-8---8--8--8--8--8--8--|-8----8--6---4-|/6---6-6-6-6-6/8--|-6---4---3-|
+E|-----------------------|---------------|------------------|-----------|
+ 
+e|-----------------|-----------------|------------------|-8----------------|
+B|-----------------|-----------------|-----9-----11-----|-------11---9~----|
+G|-3---3-3-3-3-5-6-|---5---3~--------|/8-8---8-8----8-8-|---8-8----8-------|
+D|-----------------|-----------------|------------------|------------------|
+ 
+e|-----------------|-----------------|-----------------|
+B|-----------------|-----------------|-9~--------------|
+G|-3---3-3-3-3-5-6-|---5---3----/8---|-----------------|
+D|-----------------|-----------------|-----------------|
 
 Don't wanna be an American idiot
 One nation controlled by the media
@@ -57,9 +71,7 @@ America
 Chorus
 Welcome to a new kind of tension
 All across the alien nation
-Where everything isn't meant to be
-okay
+Where everything isn't meant to be okay
 In television dreams of tomorrow
-We're not the ones who're meant
-to follow
+We're not the ones who're meant to follow
 For that's enough to argue

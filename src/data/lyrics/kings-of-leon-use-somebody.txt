@@ -1,77 +1,63 @@
+Riff 1
+G|---9--9--9--9---9--9--9--9---2-2-2-2--2-2-2-2-|
+D|--10-10-10-10--10-10-10-10---3-3-3-3--3-3-3-3-|
+A|--10-10-10-10--10-10-10-10---3-3-3-3--3-3-3-3-|
+E|---8--8--8--8---0--0--0--0---1-1-1-1--1-1-1-1-|
+
+Riff 2
+G|---5-5-5-5---9--9--9--9--2-2-2-2--2-2-2-2-|
+D|---7-7-7-7--10-10-10-10--3-3-3-3--3-3-3-3-|
+A|---7-7-7-7--10-10-10-10--3-3-3-3--3-3-3-3-|
+E|---5-5-5-5---8--8--8--8--1-1-1-1--1-1-1-1-|
+
 Intro (4x)
-C      Em     F
 Woah ah ohh Woah ah ohhh
 
-C           Em          F
-I've been roaming around always lookin down at
-all I see.
-C     Em         F
-Painted faces filled with places I can't reach.
-   Am     C     F
+I've been roaming around always lookin down at all I see
+Painted faces filled with places I can't reach
 You know that I could use somebody
-   Am     C     F
 You know that I could use somebody
-C     Em     F
-Someone like you and all you know and how
-you speak
-C   Em     F
-Countless lovers undercover of the street
 
-Chorus
-   Am     C     F
+Someone like you and all you know and how you speak
+Countless lovers undercover of the street
 You know that I could use somebody
-   Am     C     F
 You know that I could use somebody
-C
 Someone like you
 
-  Em     F
-Woah ah ohh Woah ah ohhh
-  Em     F
-Woah ah ohh Woah ah ohhh
-Am     C     F
-Woah ah ohh Woah ah ohhh
-Am     C     F
-Woah ah ohh Woah ah ohhh
+Woah ah ohh Woah ah ohhh (x4)
 
-Off in the night while you live it up I'm off to
-sleep
-Waging wars to shake the poet and the
-beat
-
-Chorus
-Am     C     F  F
+Off in the night while you live it up I'm off to sleep
+Waging wars to shake the poet and the beat
 I hope it's gonna make you notice
-Am     C     F  F
 I hope it's gonna make you notice
 
-C
 Someone like me
-  Em     F
 Woah ah ohh Woah ah ohhh
-Am
 Someone like me, somebody
-  C     F
 Woah ah ohh Woah ah ohhh
-Am     C     F
 Woah ah ohh Woah ah ohhh
 
-(D E F#) x7
-(pause 2x, backing vocal comes in on the 2nd)
+Bridge
+G|--11-11-11-11-11-11-11-11-----3-3-3-3-3-3-3-3----|
+D|--12-12-12-12-12-12-12 12-x2--4-4-4-4-4-4-4-4-x2-|
+A|--12-12-12-12-12-12-12-12-----4-4-4-4-4-4-4-4----|
+E|--10-10-10-10-10-10-10-10-----2-2-2-2-2-2-2-2----|
+    (Dont let it out  Dont let it out)
+ 
+G|--11-11-11-11-11-11-11-11-3-3-3-3-3-3------------|
+D|--12-12-12-12-12-12-12 12-4-4-4-4-4-4------------|
+A|--12-12-12-12-12-12-12-12-4-4-4-4-4-4-2/7--------|
+E|--10-10-10-10-10-10-10-10-2-2-2-2-2-2-2/7--------|
+    (Dont let it out  Dont let it out)
+
+[Riff 1]1x - [Riff 2]1x
 
 Chorus
-Am
 Someone like you somebody
-C     F
 Woah ah ohh Woah ah ohhh
-Am
 Someone like you somebody
-C     F
 Woah ah ohh Woah ah ohhh
-Am
 Someone like you somebody
-C     F
 Woah ah ohh Woah ah ohhh
 
-I've been roaming around always lookin down at
-all I see.
+I've been roaming around always lookin down at all I see
