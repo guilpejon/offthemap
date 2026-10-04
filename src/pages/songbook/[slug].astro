@@ -71,7 +71,14 @@ function renderLyrics(raw: string) {
     l.type === 'blank' && lines[i - 1]?.type === 'tab' ? 'tab-gap' : l.type
   );
 
-  // Tab lines and tab gaps are block elements that already force their own
+  // Stanza breaks (any other blank line) get the same treatment, so the gap
+  // between verses can be tuned shorter than a full line and fit more of the
+  // song on screen.
+  //
+  // Chord lines are blocks too, so they can have a tighter line-height than
+  // lyrics (an inline line can't go below the parent's line-height).
+  //
+  // Tab lines, chord lines and gaps are block elements that already force their own
   // line break — leaving the raw '\n' in would add an extra blank-line gap
   // (it sits outside the span, so it renders at the parent's line-height).
   return lines
@@ -92,11 +99,16 @@ function renderLyrics(raw: string) {
         case 'tab-gap':
           rendered = `<span class="tab-gap"></span>`;
           break;
+        case 'blank':
+          rendered = `<span class="stanza-gap"></span>`;
+          break;
         default:
           rendered = escaped;
       }
       const prevType = i > 0 ? types[i - 1] : null;
-      const separator = i === 0 || prevType === 'tab' || prevType === 'tab-gap' ? '' : '\n';
+      const separator = i === 0 || prevType === 'tab' || prevType === 'tab-gap' || prevType === 'blank' || prevType === 'chord'
+          ? ''
+          : '\n';
       return separator + rendered;
     })
     .join('');
@@ -116,13 +128,128 @@ const lyricsHtml = renderLyrics(text);
     </header>
 
     <pre class="lyrics" set:html={lyricsHtml} />
+    <script is:inline>
+      // Apply the saved size before first paint so the lyrics don't visibly jump.
+      try {
+        const saved = Number(localStorage.getItem('lyrics-scale'));
+        if (saved) document.documentElement.style.setProperty('--lyrics-scale', String(saved));
+      } catch {}
+    </script>
   </main>
+
+  <div class="play-toolbar hard-sm" role="toolbar" aria-label="Controles de leitura">
+    <button type="button" class="tool-btn" data-action="smaller" aria-label="Diminuir fonte">A−</button>
+    <span class="scale-label" aria-live="polite">100%</span>
+    <button type="button" class="tool-btn" data-action="bigger" aria-label="Aumentar fonte">A+</button>
+    <button type="button" class="tool-btn wake-btn" data-action="wake" aria-pressed="false" hidden>
+      Tela ligada
+    </button>
+  </div>
 </Layout>
+
+<script>
+  const SCALES = [0.6, 0.7, 0.8, 0.9, 1, 1.15, 1.3, 1.5, 1.75, 2, 2.3, 2.6, 3];
+  const SCALE_KEY = 'lyrics-scale';
+  const WAKE_KEY = 'lyrics-wake';
+
+  const root = document.documentElement;
+  const toolbar = document.querySelector<HTMLElement>('.play-toolbar')!;
+  const label = toolbar.querySelector<HTMLElement>('.scale-label')!;
+  const smallerBtn = toolbar.querySelector<HTMLButtonElement>('[data-action="smaller"]')!;
+  const biggerBtn = toolbar.querySelector<HTMLButtonElement>('[data-action="bigger"]')!;
+  const wakeBtn = toolbar.querySelector<HTMLButtonElement>('[data-action="wake"]')!;
+
+  // localStorage can throw (private mode, blocked storage) — preferences are a nicety.
+  function load(key: string) {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }
+
+  function save(key: string, value: string) {
+    try {
+      localStorage.setItem(key, value);
+    } catch {}
+  }
+
+  // Font size
+
+  let scaleIndex = SCALES.indexOf(Number(load(SCALE_KEY)));
+  if (scaleIndex === -1) scaleIndex = SCALES.indexOf(1);
+
+  function applyScale() {
+    const scale = SCALES[scaleIndex];
+    root.style.setProperty('--lyrics-scale', String(scale));
+    label.textContent = `${Math.round(scale * 100)}%`;
+    smallerBtn.disabled = scaleIndex === 0;
+    biggerBtn.disabled = scaleIndex === SCALES.length - 1;
+    save(SCALE_KEY, String(scale));
+  }
+
+  smallerBtn.addEventListener('click', () => {
+    scaleIndex = Math.max(0, scaleIndex - 1);
+    applyScale();
+  });
+
+  biggerBtn.addEventListener('click', () => {
+    scaleIndex = Math.min(SCALES.length - 1, scaleIndex + 1);
+    applyScale();
+  });
+
+  applyScale();
+
+  // Keep the screen awake
+
+  if ('wakeLock' in navigator) {
+    let sentinel: WakeLockSentinel | null = null;
+    let wanted = load(WAKE_KEY) === '1';
+
+    function render() {
+      wakeBtn.setAttribute('aria-pressed', String(sentinel !== null));
+    }
+
+    async function acquire() {
+      try {
+        sentinel = await navigator.wakeLock.request('screen');
+        // The browser drops the lock when the tab is hidden; track that so the
+        // button reflects reality and we can re-acquire on return.
+        sentinel.addEventListener('release', () => {
+          sentinel = null;
+          render();
+        });
+      } catch {
+        sentinel = null;
+      }
+      render();
+    }
+
+    wakeBtn.addEventListener('click', async () => {
+      wanted = !wanted;
+      save(WAKE_KEY, wanted ? '1' : '0');
+      if (wanted) {
+        await acquire();
+      } else {
+        await sentinel?.release();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (wanted && document.visibilityState === 'visible' && !sentinel) acquire();
+    });
+
+    wakeBtn.hidden = false;
+    if (wanted) acquire();
+  }
+</script>
 
 <style>
   main.wrap {
-    padding: 2.5rem 1.5rem 4rem;
-    max-width: 700px;
+    /* Extra bottom room so the last lines can scroll clear of the toolbar. */
+    padding: 1.5rem 1.5rem 7rem;
+    /* Wide enough that big font sizes on a tablet don't wrap lines needlessly. */
+    max-width: 980px;
   }
 
   .back-link {
@@ -131,7 +258,7 @@ const lyricsHtml = renderLyrics(text);
     font-weight: 700;
     text-decoration: none;
     font-size: 0.85rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   .back-link:hover {
@@ -139,8 +266,8 @@ const lyricsHtml = renderLyrics(text);
   }
 
   .song-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.2rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.9rem;
     border-bottom: var(--border-w) solid var(--ink);
   }
 
@@ -170,8 +297,13 @@ const lyricsHtml = renderLyrics(text);
     font-family: 'Space Grotesk', system-ui, sans-serif;
     white-space: pre-wrap;
     word-wrap: break-word;
-    font-size: 1.05rem;
-    line-height: 1.7;
+    /* Child sizes below are in em so they scale along with --lyrics-scale. */
+    /* Sizes that drive the vertical rhythm are rounded to whole pixels: with
+       fractional sizes each row lands on a different sub-pixel offset and the
+       glyphs snap unevenly, so identical chord/lyric gaps render 1-2px apart. */
+    --fs: round(calc(1.05rem * var(--lyrics-scale, 1)), 1px);
+    font-size: var(--fs);
+    line-height: round(calc(var(--fs) * 1.4), 1px);
     margin: 0;
   }
 
@@ -180,12 +312,17 @@ const lyricsHtml = renderLyrics(text);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 0.85rem;
+    font-size: 0.81em;
     opacity: 0.6;
   }
 
   .lyrics :global(.chord-line) {
-    display: inline-block;
+    display: block;
+    line-height: var(--fs);
+    /* Chords are mostly capitals with no descenders, so the bottom of their
+       box is empty — tuck the chord down onto the lyric it belongs to. */
+    margin-top: round(calc(var(--fs) * 0.15), 1px);
+    margin-bottom: round(calc(var(--fs) * -0.3), 1px);
     font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     font-weight: 700;
     color: var(--pink);
@@ -194,7 +331,7 @@ const lyricsHtml = renderLyrics(text);
   .lyrics :global(.tab-line) {
     display: block;
     font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-    font-size: 0.85rem;
+    font-size: 0.81em;
     line-height: 1.4;
     color: var(--ink);
     background: color-mix(in srgb, var(--periwinkle) 12%, transparent);
@@ -202,10 +339,73 @@ const lyricsHtml = renderLyrics(text);
     padding: 0 0.5rem;
     margin-left: -0.5rem;
     width: fit-content;
+    /* Wrapping a tab row scrambles it — at big sizes, scroll sideways instead. */
+    white-space: pre;
+    max-width: calc(100% + 0.5rem);
+    overflow-x: auto;
+  }
+
+  .lyrics :global(.stanza-gap) {
+    display: block;
+    height: round(calc(var(--fs) * 0.9), 1px);
   }
 
   .lyrics :global(.tab-gap) {
     display: block;
-    height: 0.6rem;
+    height: 0.6em;
+  }
+
+  .play-toolbar {
+    position: fixed;
+    left: 50%;
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    background: var(--paper);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .tool-btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.95rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.7rem;
+    border: 2px solid var(--ink);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .tool-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .wake-btn {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-left: 0.35rem;
+  }
+
+  .wake-btn[aria-pressed='true'] {
+    background: var(--lime);
+  }
+
+  .scale-label {
+    min-width: 3.2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
   }
 </style>
