@@ -19,6 +19,7 @@ const hasLyrics = Boolean(lyrics[slug]);
   class="row"
   data-slug={slug}
   data-title={song.title}
+  data-artist={song.artist}
   data-length-seconds={toSeconds(song.length)}
   data-bpm={song.bpm}
   data-key-sort={keySortValue(song.key)}

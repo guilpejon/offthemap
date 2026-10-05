@@ -33,7 +33,8 @@ const alphabeticalSongs = [...section.songs]
       <p class="subtitle">{section.subtitle}</p>
       <p class="stats-text">{section.songs.length}&nbsp;músicas · {totalLength(section.songs)}</p>
       <div class="sort-bar" role="group" aria-label="Ordenar músicas">
-        <button type="button" class="badge hard-sm sort-btn active-asc" data-sort="alpha">A-Z</button>
+        <button type="button" class="badge hard-sm sort-btn active-asc" data-sort="alpha">Música A-Z</button>
+        <button type="button" class="badge hard-sm sort-btn" data-sort="artist">Banda A-Z</button>
         <button type="button" class="badge hard-sm sort-btn" data-sort="length">Duração</button>
         <button type="button" class="badge hard-sm sort-btn" data-sort="bpm">BPM</button>
         <button type="button" class="badge hard-sm sort-btn" data-sort="key">Tom</button>
@@ -49,7 +50,7 @@ const alphabeticalSongs = [...section.songs]
 </section>
 
 <script>
-  type SortKey = 'alpha' | 'length' | 'bpm' | 'key';
+  type SortKey = 'alpha' | 'artist' | 'length' | 'bpm' | 'key';
   type SortState = { key: SortKey; dir: 'asc' | 'desc' };
 
   const DEFAULT_SORT: SortState = { key: 'alpha', dir: 'asc' };
@@ -58,6 +59,8 @@ const alphabeticalSongs = [...section.songs]
     switch (key) {
       case 'alpha':
         return row.dataset.title ?? '';
+      case 'artist':
+        return row.dataset.artist ?? '';
       case 'length':
         return Number(row.dataset.lengthSeconds);
       case 'bpm':
@@ -80,7 +83,9 @@ const alphabeticalSongs = [...section.songs]
       items.sort((a, b) => {
         const va = getValue(a, key);
         const vb = getValue(b, key);
-        const cmp = typeof va === 'string' ? va.localeCompare(vb as string, 'pt-BR') : va - (vb as number);
+        let cmp = typeof va === 'string' ? va.localeCompare(vb as string, 'pt-BR') : va - (vb as number);
+        // Same band: keep its songs in title order.
+        if (cmp === 0 && key === 'artist') cmp = (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '', 'pt-BR');
         return dir === 'asc' ? cmp : -cmp;
       });
       items.forEach((item) => list!.appendChild(item));
