@@ -62,56 +62,66 @@ function renderLyrics(raw: string) {
 
   const lines = raw.split('\n').map(classifyLine);
 
-  // A blank line right after a tab line (separating two tab blocks, or
-  // ending one) becomes a small dedicated gap instead of a full paragraph
-  // break — otherwise it inherits the lyrics block's larger line-height and
-  // looks like a much bigger gap than the tightly-packed tab rows around it.
-  type RenderType = 'section' | 'chord' | 'tab' | 'tab-gap' | 'lyric' | 'blank';
-  const types: RenderType[] = lines.map((l, i) =>
-    l.type === 'blank' && lines[i - 1]?.type === 'tab' ? 'tab-gap' : l.type
-  );
+  // Group lines into stanzas at blank lines. Each stanza becomes its own block,
+  // so stage mode can keep a verse/chorus together in one column, and the gap
+  // between verses is a tunable margin rather than a full empty line.
+  //
+  // Exception: a blank line between two tab rows (separating two tab blocks)
+  // stays inside the stanza as a small gap — a full stanza break there looks
+  // much bigger than the tightly-packed tab rows around it.
+  type RenderType = 'section' | 'chord' | 'tab' | 'tab-gap' | 'lyric';
+  const stanzas: { type: RenderType; text: string }[][] = [];
+  let current: { type: RenderType; text: string }[] = [];
 
-  // Stanza breaks (any other blank line) get the same treatment, so the gap
-  // between verses can be tuned shorter than a full line and fit more of the
-  // song on screen.
-  //
-  // Chord lines are blocks too, so they can have a tighter line-height than
-  // lyrics (an inline line can't go below the parent's line-height).
-  //
-  // Tab lines, chord lines and gaps are block elements that already force their own
-  // line break — leaving the raw '\n' in would add an extra blank-line gap
-  // (it sits outside the span, so it renders at the parent's line-height).
-  return lines
-    .map(({ text }, i) => {
-      const type = types[i];
-      const escaped = escape(text);
-      let rendered: string;
-      switch (type) {
-        case 'section':
-          rendered = `<strong class="section-label">${escaped}</strong>`;
-          break;
-        case 'chord':
-          rendered = `<span class="chord-line">${escaped}</span>`;
-          break;
-        case 'tab':
-          rendered = `<span class="tab-line">${escaped}</span>`;
-          break;
-        case 'tab-gap':
-          rendered = `<span class="tab-gap"></span>`;
-          break;
-        case 'blank':
-          rendered = `<span class="stanza-gap"></span>`;
-          break;
-        default:
-          rendered = escaped;
-      }
-      const prevType = i > 0 ? types[i - 1] : null;
-      const separator = i === 0 || prevType === 'tab' || prevType === 'tab-gap' || prevType === 'blank' || prevType === 'chord'
-          ? ''
-          : '\n';
-      return separator + rendered;
-    })
-    .join('');
+  lines.forEach((line, i) => {
+    if (line.type !== 'blank') {
+      current.push({ type: line.type, text: line.text });
+      return;
+    }
+    const next = lines.slice(i + 1).find((l) => l.type !== 'blank');
+    if (lines[i - 1]?.type === 'tab' && next?.type === 'tab') {
+      current.push({ type: 'tab-gap', text: '' });
+    } else if (current.length) {
+      stanzas.push(current);
+      current = [];
+    }
+  });
+  if (current.length) stanzas.push(current);
+
+  // Tab lines, chord lines and gaps are block elements that already force their
+  // own line break — a raw '\n' after one would add an extra blank-line gap (it
+  // sits outside the span, so it renders at the parent's line-height). Chord
+  // lines are blocks so they can have a tighter line-height than lyrics (an
+  // inline line can't go below the parent's line-height).
+  const renderStanza = (stanza: { type: RenderType; text: string }[]) =>
+    stanza
+      .map(({ type, text }, i) => {
+        const escaped = escape(text);
+        let rendered: string;
+        switch (type) {
+          case 'section':
+            rendered = `<strong class="section-label">${escaped}</strong>`;
+            break;
+          case 'chord':
+            rendered = `<span class="chord-line">${escaped}</span>`;
+            break;
+          case 'tab':
+            rendered = `<span class="tab-line">${escaped}</span>`;
+            break;
+          case 'tab-gap':
+            rendered = `<span class="tab-gap"></span>`;
+            break;
+          default:
+            rendered = escaped;
+        }
+        const prevType = i > 0 ? stanza[i - 1].type : null;
+        const separator =
+          i === 0 || prevType === 'tab' || prevType === 'tab-gap' || prevType === 'chord' ? '' : '\n';
+        return separator + rendered;
+      })
+      .join('');
+
+  return stanzas.map((stanza) => `<div class="stanza">${renderStanza(stanza)}</div>`).join('');
 }
 
 const lyricsHtml = renderLyrics(text);
@@ -119,20 +129,27 @@ const lyricsHtml = renderLyrics(text);
 
 <Layout title={`${song.title} — ${song.artist} — Off The Map`} description={`Letra de ${song.title}, de ${song.artist}.`}>
   <main class="wrap">
-    <a class="back-link" href={`${base}/songbook/`}>&larr; Songbook</a>
+    <div class="song-top">
+      <a class="back-link" href={`${base}/songbook/`}>&larr; Songbook</a>
 
-    <header class="song-header">
-      <h1>{song.title}</h1>
-      <p class="artist">{song.artist}</p>
-      <p class="meta">{song.bpm}&nbsp;BPM · {keyName(song.key)}</p>
-    </header>
+      <header class="song-header">
+        <h1>{song.title}</h1>
+        <p class="artist">{song.artist}</p>
+        <p class="meta">{song.bpm}&nbsp;BPM · {keyName(song.key)}</p>
+      </header>
+    </div>
 
-    <pre class="lyrics" set:html={lyricsHtml} />
+    <!-- .lyrics is the viewport; in stage mode .lyrics-flow lays the stanzas out
+         in columns and slides sideways one page at a time. -->
+    <div class="lyrics">
+      <div class="lyrics-flow" set:html={lyricsHtml} />
+    </div>
     <script is:inline>
-      // Apply the saved size before first paint so the lyrics don't visibly jump.
+      // Apply saved preferences before first paint so the lyrics don't visibly jump.
       try {
         const saved = Number(localStorage.getItem('lyrics-scale'));
         if (saved) document.documentElement.style.setProperty('--lyrics-scale', String(saved));
+        if (localStorage.getItem('lyrics-stage') === '1') document.documentElement.classList.add('stage');
       } catch {}
     </script>
   </main>
@@ -141,9 +158,17 @@ const lyricsHtml = renderLyrics(text);
     <button type="button" class="tool-btn" data-action="smaller" aria-label="Diminuir fonte">A−</button>
     <span class="scale-label" aria-live="polite">100%</span>
     <button type="button" class="tool-btn" data-action="bigger" aria-label="Aumentar fonte">A+</button>
-    <button type="button" class="tool-btn wake-btn" data-action="wake" aria-pressed="false" hidden>
+    <button type="button" class="tool-btn text-btn" data-action="wake" aria-pressed="false" hidden>
       Tela ligada
     </button>
+    <button type="button" class="tool-btn text-btn stage-btn" data-action="stage" aria-pressed="false">
+      Palco
+    </button>
+    <span class="pager">
+      <button type="button" class="tool-btn" data-action="prev" aria-label="Página anterior">‹</button>
+      <span class="page-label" aria-live="polite">1/1</span>
+      <button type="button" class="tool-btn" data-action="next" aria-label="Próxima página">›</button>
+    </span>
   </div>
 </Layout>
 
@@ -191,11 +216,13 @@ const lyricsHtml = renderLyrics(text);
   smallerBtn.addEventListener('click', () => {
     scaleIndex = Math.max(0, scaleIndex - 1);
     applyScale();
+    layoutStage();
   });
 
   biggerBtn.addEventListener('click', () => {
     scaleIndex = Math.min(SCALES.length - 1, scaleIndex + 1);
     applyScale();
+    layoutStage();
   });
 
   applyScale();
@@ -242,6 +269,144 @@ const lyricsHtml = renderLyrics(text);
     wakeBtn.hidden = false;
     if (wanted) acquire();
   }
+
+  // Stage mode: the song laid out in columns sized to the screen, turned a page
+  // at a time (buttons, swipe, arrow keys or a Bluetooth page-turner pedal).
+
+  const STAGE_KEY = 'lyrics-stage';
+  const stageQuery = matchMedia('(min-width: 700px)');
+  const viewport = document.querySelector<HTMLElement>('.lyrics')!;
+  const flow = viewport.querySelector<HTMLElement>('.lyrics-flow')!;
+  const stageBtn = toolbar.querySelector<HTMLButtonElement>('[data-action="stage"]')!;
+  const prevBtn = toolbar.querySelector<HTMLButtonElement>('[data-action="prev"]')!;
+  const nextBtn = toolbar.querySelector<HTMLButtonElement>('[data-action="next"]')!;
+  const pageLabel = toolbar.querySelector<HTMLElement>('.page-label')!;
+
+  let page = 0;
+  let pageCount = 1;
+
+  function stageActive() {
+    return root.classList.contains('stage') && stageQuery.matches;
+  }
+
+  const MIN_TAB_SHRINK = 0.6;
+
+  function resetTabSizes() {
+    flow.querySelectorAll<HTMLElement>('.tab-line').forEach((el) => (el.style.fontSize = ''));
+  }
+
+  // Column width = the widest lyric/chord line, so chord lines never wrap and
+  // drift off their lyric. Songs with short lines get more columns per screen.
+  // Tab blocks don't count toward it — one wide intro riff would otherwise
+  // force the whole song into a single column. Instead, a tab block wider than
+  // its column is shrunk to fit (it's monospace, so rows stay aligned).
+  function fitColumns() {
+    resetTabSizes();
+    const stanzas = Array.from(flow.querySelectorAll<HTMLElement>('.stanza'));
+    const width = (el: Element) => el.getBoundingClientRect().width;
+
+    flow.classList.add('measuring');
+    const tabBlocks = stanzas
+      .map((stanza) => Array.from(stanza.querySelectorAll<HTMLElement>('.tab-line')))
+      .filter((rows) => rows.length)
+      .map((rows) => ({ rows, width: Math.max(...rows.map(width)) }));
+    flow.classList.add('measuring-text');
+    const widest = Math.max(0, ...stanzas.map(width));
+    flow.classList.remove('measuring', 'measuring-text');
+
+    flow.style.setProperty('--col-width', `${Math.ceil(widest) + 1}px`);
+
+    // The column width the browser actually uses (CSS multi-column algorithm).
+    const style = getComputedStyle(flow);
+    const gap = parseFloat(style.columnGap);
+    const ideal = parseFloat(style.columnWidth);
+    const count = Math.max(1, Math.floor((flow.clientWidth + gap) / (ideal + gap)));
+    const column = (flow.clientWidth + gap) / count - gap;
+
+    tabBlocks.forEach(({ rows, width: blockWidth }) => {
+      if (blockWidth <= column) return;
+      // The block's padding + border don't shrink with the font.
+      const chrome = rows[0].offsetWidth - rows[0].clientWidth + parseFloat(getComputedStyle(rows[0]).paddingLeft) * 2;
+      const ratio = Math.max(MIN_TAB_SHRINK, (column - chrome) / (blockWidth - chrome));
+      rows.forEach((row) => (row.style.fontSize = `calc(0.81em * ${ratio.toFixed(3)})`));
+    });
+  }
+
+  function pageStep() {
+    return flow.clientWidth + parseFloat(getComputedStyle(flow).columnGap);
+  }
+
+  function showPage() {
+    flow.style.transform = page ? `translateX(${-page * pageStep()}px)` : '';
+    pageLabel.textContent = `${page + 1}/${pageCount}`;
+    prevBtn.disabled = page === 0;
+    nextBtn.disabled = page === pageCount - 1;
+  }
+
+  function layoutStage() {
+    const active = stageActive();
+    stageBtn.setAttribute('aria-pressed', String(root.classList.contains('stage')));
+    if (!active) {
+      flow.style.transform = '';
+      resetTabSizes();
+      return;
+    }
+    fitColumns();
+    // Count pages from where the last stanza ends, measured without the
+    // current page offset.
+    flow.style.transform = '';
+    const last = flow.lastElementChild?.getBoundingClientRect();
+    const left = flow.getBoundingClientRect().left;
+    pageCount = last ? Math.floor((last.right - left - 1) / pageStep()) + 1 : 1;
+    page = Math.min(page, pageCount - 1);
+    showPage();
+  }
+
+  function turn(delta: number) {
+    const target = Math.max(0, Math.min(pageCount - 1, page + delta));
+    if (target === page) return;
+    page = target;
+    showPage();
+  }
+
+  stageBtn.addEventListener('click', () => {
+    const on = root.classList.toggle('stage');
+    save(STAGE_KEY, on ? '1' : '0');
+    page = 0;
+    layoutStage();
+  });
+
+  prevBtn.addEventListener('click', () => turn(-1));
+  nextBtn.addEventListener('click', () => turn(1));
+
+  document.addEventListener('keydown', (e) => {
+    if (!stageActive() || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) {
+      e.preventDefault();
+      turn(1);
+    } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+      e.preventDefault();
+      turn(-1);
+    }
+  });
+
+  let swipeStart: { x: number; y: number } | null = null;
+  viewport.addEventListener('pointerdown', (e) => {
+    swipeStart = { x: e.clientX, y: e.clientY };
+  });
+  viewport.addEventListener('pointerup', (e) => {
+    if (!swipeStart || !stageActive()) return;
+    const dx = e.clientX - swipeStart.x;
+    const dy = e.clientY - swipeStart.y;
+    swipeStart = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) turn(dx < 0 ? 1 : -1);
+  });
+
+  new ResizeObserver(() => layoutStage()).observe(viewport);
+  stageQuery.addEventListener('change', layoutStage);
+  // Web fonts change line widths once they load.
+  document.fonts.ready.then(layoutStage);
+  layoutStage();
 </script>
 
 <style>
@@ -293,7 +458,7 @@ const lyricsHtml = renderLyrics(text);
     font-variant-numeric: tabular-nums;
   }
 
-  .lyrics {
+  .lyrics-flow {
     font-family: 'Space Grotesk', system-ui, sans-serif;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -304,10 +469,13 @@ const lyricsHtml = renderLyrics(text);
     --fs: round(calc(1.05rem * var(--lyrics-scale, 1)), 1px);
     font-size: var(--fs);
     line-height: round(calc(var(--fs) * 1.4), 1px);
-    margin: 0;
   }
 
-  .lyrics :global(.section-label) {
+  .lyrics-flow :global(.stanza + .stanza) {
+    margin-top: round(calc(var(--fs) * 0.9), 1px);
+  }
+
+  .lyrics-flow :global(.section-label) {
     display: inline-block;
     font-weight: 700;
     text-transform: uppercase;
@@ -316,19 +484,19 @@ const lyricsHtml = renderLyrics(text);
     opacity: 0.6;
   }
 
-  .lyrics :global(.chord-line) {
+  .lyrics-flow :global(.chord-line) {
     display: block;
     line-height: var(--fs);
     /* Chords are mostly capitals with no descenders, so the bottom of their
        box is empty — tuck the chord down onto the lyric it belongs to. */
     margin-top: round(calc(var(--fs) * 0.15), 1px);
-    margin-bottom: round(calc(var(--fs) * -0.3), 1px);
+    margin-bottom: round(calc(var(--fs) * -0.15), 1px);
     font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     font-weight: 700;
     color: var(--pink);
   }
 
-  .lyrics :global(.tab-line) {
+  .lyrics-flow :global(.tab-line) {
     display: block;
     font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     font-size: 0.81em;
@@ -345,12 +513,7 @@ const lyricsHtml = renderLyrics(text);
     overflow-x: auto;
   }
 
-  .lyrics :global(.stanza-gap) {
-    display: block;
-    height: round(calc(var(--fs) * 0.9), 1px);
-  }
-
-  .lyrics :global(.tab-gap) {
+  .lyrics-flow :global(.tab-gap) {
     display: block;
     height: 0.6em;
   }
@@ -360,6 +523,10 @@ const lyricsHtml = renderLyrics(text);
     left: 50%;
     bottom: calc(1rem + env(safe-area-inset-bottom));
     transform: translateX(-50%);
+    /* left: 50% only leaves half the viewport to shrink-to-fit into, which
+       squeezed the buttons and wrapped their labels — size to content instead. */
+    width: max-content;
+    max-width: calc(100vw - 1rem);
     z-index: 50;
     display: flex;
     align-items: center;
@@ -389,15 +556,137 @@ const lyricsHtml = renderLyrics(text);
     cursor: default;
   }
 
-  .wake-btn {
+  .text-btn {
+    white-space: nowrap;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     margin-left: 0.35rem;
   }
 
-  .wake-btn[aria-pressed='true'] {
+  .text-btn[aria-pressed='true'] {
     background: var(--lime);
+  }
+
+  /* Stage mode only makes sense with room for columns (tablet/laptop). */
+  .stage-btn,
+  .pager {
+    display: none;
+  }
+
+  .pager {
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.35rem;
+  }
+
+  .page-label {
+    min-width: 2.6rem;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+  }
+
+  @media (min-width: 700px) {
+    .stage-btn {
+      display: block;
+    }
+
+    :global(html.stage) .pager {
+      display: flex;
+    }
+
+    :global(html.stage) main.wrap {
+      max-width: none;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 0.75rem 1.5rem calc(5.5rem + env(safe-area-inset-bottom));
+    }
+
+    /* One compact line instead of the big header — every row counts. */
+    :global(html.stage) .song-top {
+      display: flex;
+      align-items: baseline;
+      gap: 1.2rem;
+      margin-bottom: 0.9rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    :global(html.stage) .back-link {
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    :global(html.stage) .song-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.9rem;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      min-width: 0;
+    }
+
+    :global(html.stage) h1 {
+      font-size: 1.2rem;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    :global(html.stage) .artist,
+    :global(html.stage) .meta {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    /* The viewport clips the off-screen pages. The side padding (cancelled by
+       the negative margin) leaves room for the tab blocks' left border. */
+    :global(html.stage) .lyrics {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      margin-inline: -0.5rem;
+      padding-inline: 0.5rem;
+      touch-action: pan-y;
+    }
+
+    :global(html.stage) .lyrics-flow {
+      height: 100%;
+      column-width: max(var(--col-width, 20em), 12em);
+      column-gap: 3rem;
+      column-fill: auto;
+      column-rule: 2px solid color-mix(in srgb, var(--ink) 12%, transparent);
+      transition: transform 0.25s ease;
+    }
+
+    :global(html.stage) .lyrics-flow :global(.stanza) {
+      break-inside: avoid;
+    }
+
+    /* Measuring pass: each stanza at its natural width = its longest line. */
+    .lyrics-flow:global(.measuring) :global(.stanza) {
+      width: max-content;
+    }
+
+    .lyrics-flow:global(.measuring) :global(.tab-line) {
+      max-width: none;
+    }
+
+    .lyrics-flow:global(.measuring-text) :global(.tab-line) {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lyrics-flow {
+      transition: none !important;
+    }
   }
 
   .scale-label {

@@ -82,6 +82,14 @@ export function keyName(key: string): string {
   return name ? `${name} (${key})` : key;
 }
 
+// Chord-style short name, e.g. "F#m" for 11A, "D" for 10B.
+export function keyShortName(key: string): string {
+  const name = CAMELOT_KEY_NAMES[key];
+  if (!name) return key;
+  const [root, quality] = name.split(' ');
+  return quality === 'minor' ? `${root}m` : root;
+}
+
 export function totalLength(songs: Song[]): string {
   const totalSeconds = songs.reduce((sum, s) => sum + toSeconds(s.length), 0);
   const min = Math.floor(totalSeconds / 60);
