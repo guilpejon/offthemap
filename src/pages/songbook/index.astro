@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
-import { uniqueSongs, songSlug, toSeconds, keySortValue } from '../../data/songs';
+import { uniqueSongs, songSlug, toSeconds, keySortValue, keyName, keyShortName } from '../../data/songs';
 import { lyrics } from '../../data/lyrics';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -44,6 +44,13 @@ const songs = uniqueSongs();
       {songs.map((song) => {
         const slug = songSlug(song);
         const hasLyrics = Boolean(lyrics[slug]);
+        const meta = (
+          <span class="meta">
+            <span class="meta-length">{song.length}</span>
+            <span class="meta-bpm">{song.bpm}&nbsp;BPM</span>
+            <span class="meta-key" title={keyName(song.key)}>{keyShortName(song.key)}</span>
+          </span>
+        );
         return (
           <li
             class="song-item"
@@ -57,11 +64,13 @@ const songs = uniqueSongs();
               <a class="song-link" href={`${base}/songbook/${slug}/`}>
                 <span class="title">{song.title}</span>
                 <span class="artist">{song.artist}</span>
+                {meta}
               </a>
             ) : (
               <span class="song-link is-disabled" aria-disabled="true">
                 <span class="title">{song.title}</span>
                 <span class="artist">{song.artist}</span>
+                {meta}
               </span>
             )}
           </li>
@@ -264,10 +273,11 @@ const songs = uniqueSongs();
     border-top: 2px dashed color-mix(in srgb, var(--ink) 20%, transparent);
   }
 
+  /* Title | artist | meta on one line; meta columns line up across rows. */
   .song-link {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
     align-items: baseline;
-    justify-content: space-between;
     gap: 1rem;
     padding: 0.85rem 0.9rem;
     text-decoration: none;
@@ -295,10 +305,37 @@ const songs = uniqueSongs();
     white-space: nowrap;
   }
 
+  .meta {
+    display: grid;
+    grid-template-columns: 2.4rem 3.6rem 2.2rem;
+    gap: 0.5rem;
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    opacity: 0.55;
+    text-align: right;
+  }
+
+  .meta-key {
+    font-weight: 700;
+  }
+
   @media (max-width: 520px) {
+    /* Title on top; artist and meta share the second line, so the row is no
+       taller than before. */
     .song-link {
-      flex-direction: column;
-      gap: 0.15rem;
+      grid-template-columns: 1fr auto;
+      row-gap: 0.15rem;
+    }
+
+    .title {
+      grid-column: 1 / -1;
+    }
+
+    .artist {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 </style>
