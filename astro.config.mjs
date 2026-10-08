@@ -3,6 +3,5 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://guilpejon.github.io',
-  base: '/offthemap',
+  site: 'https://offthemap.guilpejon.app',
 });
