@@ -14,11 +14,12 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const DIST_DIR = fileURLToPath(new URL('../dist', import.meta.url));
-const BASE = '/offthemap/';
+// Must match Astro's `base` — the site is served from the domain root.
+const BASE = '/';
 
 // Large, non-essential download — skip precaching it so install stays fast;
 // it's still cached opportunistically the first time someone opens it.
-const EXCLUDE = new Set(['lyrics.pdf']);
+const EXCLUDE = new Set(['lyrics.pdf', '.DS_Store']);
 
 async function collectFiles(dir, prefix = '') {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -85,6 +86,26 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Pages go network-first so an installed app picks up new deploys as soon
+  // as it's online; the precache only kicks in when the network fails.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(event.request).then((cached) => cached || caches.match(OFFLINE_FALLBACK))
+        )
+    );
+    return;
+  }
+
+  // Everything else (fingerprinted _astro assets, icons) is cache-first.
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
