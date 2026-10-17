@@ -121,10 +121,19 @@ function renderLyrics(raw: string) {
       })
       .join('');
 
-  return stanzas.map((stanza) => `<div class="stanza">${renderStanza(stanza)}</div>`).join('');
+  // A stanza that's nothing but tabs (plus maybe its "Intro"/"Riff" label)
+  // disappears entirely when tabs are hidden, gap and all.
+  const isTabOnly = (stanza: { type: RenderType }[]) =>
+    stanza.some(({ type }) => type === 'tab') &&
+    stanza.every(({ type }) => type === 'tab' || type === 'tab-gap' || type === 'section');
+
+  return stanzas
+    .map((stanza) => `<div class="stanza${isTabOnly(stanza) ? ' tab-only' : ''}">${renderStanza(stanza)}</div>`)
+    .join('');
 }
 
 const lyricsHtml = renderLyrics(text);
+const hasTabs = lyricsHtml.includes('class="tab-line"');
 ---
 
 <Layout title={`${song.title} — ${song.artist} — Off The Map`} description={`Letra de ${song.title}, de ${song.artist}.`}>
@@ -150,6 +159,7 @@ const lyricsHtml = renderLyrics(text);
         const saved = Number(localStorage.getItem('lyrics-scale'));
         if (saved) document.documentElement.style.setProperty('--lyrics-scale', String(saved));
         if (localStorage.getItem('lyrics-stage') === '1') document.documentElement.classList.add('stage');
+        if (localStorage.getItem('lyrics-hide-tabs') === '1') document.documentElement.classList.add('hide-tabs');
       } catch {}
     </script>
   </main>
@@ -159,11 +169,18 @@ const lyricsHtml = renderLyrics(text);
     <span class="scale-label" aria-live="polite">100%</span>
     <button type="button" class="tool-btn" data-action="bigger" aria-label="Aumentar fonte">A+</button>
     <button type="button" class="tool-btn text-btn" data-action="wake" aria-pressed="false" hidden>
-      Tela ligada
+      Tela on
     </button>
     <button type="button" class="tool-btn text-btn stage-btn" data-action="stage" aria-pressed="false">
       Palco
     </button>
+    {
+      hasTabs && (
+        <button type="button" class="tool-btn text-btn tabs-btn" data-action="tabs" aria-pressed="true">
+          Tabs
+        </button>
+      )
+    }
     <span class="pager">
       <button type="button" class="tool-btn" data-action="prev" aria-label="Página anterior">‹</button>
       <span class="page-label" aria-live="polite">1/1</span>
@@ -369,6 +386,23 @@ const lyricsHtml = renderLyrics(text);
     showPage();
   }
 
+  // Hide tabs (stage mode only): just the lyrics and chords, so more of the
+  // song fits on each page.
+
+  const TABS_KEY = 'lyrics-hide-tabs';
+  const tabsBtn = toolbar.querySelector<HTMLButtonElement>('[data-action="tabs"]');
+
+  if (tabsBtn) {
+    tabsBtn.setAttribute('aria-pressed', String(!root.classList.contains('hide-tabs')));
+    tabsBtn.addEventListener('click', () => {
+      const hidden = root.classList.toggle('hide-tabs');
+      save(TABS_KEY, hidden ? '1' : '0');
+      tabsBtn.setAttribute('aria-pressed', String(!hidden));
+      page = 0;
+      layoutStage();
+    });
+  }
+
   stageBtn.addEventListener('click', () => {
     const on = root.classList.toggle('stage');
     save(STAGE_KEY, on ? '1' : '0');
@@ -570,6 +604,7 @@ const lyricsHtml = renderLyrics(text);
 
   /* Stage mode only makes sense with room for columns (tablet/laptop). */
   .stage-btn,
+  .tabs-btn,
   .pager {
     display: none;
   }
@@ -596,6 +631,14 @@ const lyricsHtml = renderLyrics(text);
 
     :global(html.stage) .pager {
       display: flex;
+    }
+
+    :global(html.stage) .tabs-btn {
+      display: block;
+    }
+
+    :global(html.stage.hide-tabs) .lyrics-flow :global(:is(.tab-line, .tab-gap, .tab-only)) {
+      display: none;
     }
 
     :global(html.stage) main.wrap {
