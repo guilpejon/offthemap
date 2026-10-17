@@ -14,7 +14,7 @@
     "fetch:spotify": "node --env-file=.env scripts/fetch-spotify-data.mjs"
   },
   "dependencies": {
-    "astro": "^7.3.2"
+    "astro": "^7.4.0"
   },
   "allowScripts": {
     "esbuild": true
