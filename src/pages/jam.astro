@@ -2,10 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { jam, people, setlist, INSTRUMENTS, SHEET_URL, type Instrument } from '../data/jam';
+import { jam, people, setlist, SHEET_URL } from '../data/jam';
 import { allSongs, songSlug, spotifyLink } from '../data/songs';
 import { lyrics } from '../data/lyrics';
-import { icon, renderRoster, renderSetlist, renderStats, type SongLinks } from '../lib/jam-view';
+import { renderRoster, renderSetlist, renderStats, type SongLinks } from '../lib/jam-view';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -20,7 +20,6 @@ const links: SongLinks = Object.fromEntries(
 
 const [y, m, d] = jam.date.split('-');
 const dateLabel = `${d}/${m}/${y}`;
-const legend = (Object.keys(INSTRUMENTS) as Instrument[]).filter((i) => i !== 'guitar2' && i !== 'guitar3');
 ---
 
 <Layout title={`${jam.title} — ${dateLabel}`} description="Quem toca o quê na jam de fim de ano.">
@@ -33,18 +32,6 @@ const legend = (Object.keys(INSTRUMENTS) as Instrument[]).filter((i) => i !== 'g
         <span class="badge hard-sm date">{dateLabel} · {jam.time} · {jam.place}</span>
         <h1>{jam.title}</h1>
         <p class="stats" id="jam-stats" set:html={renderStats(setlist, people)} />
-        <ul class="legend" aria-label="Legenda">
-          {legend.map((i) => (
-            <li style={`--c: ${INSTRUMENTS[i].color};`}>
-              <span class="legend-icon" set:html={icon(i)} />
-              {INSTRUMENTS[i].label}
-            </li>
-          ))}
-          <li class="legend-open">
-            <span class="legend-icon" set:html={icon('guitar')} />
-            Vaga aberta
-          </li>
-        </ul>
         <p class="source" id="jam-source" data-state="loading">
           <span class="source-dot"></span>
           <span class="source-text">Carregando da planilha…</span>
@@ -229,39 +216,6 @@ const legend = (Object.keys(INSTRUMENTS) as Instrument[]).filter((i) => i !== 'g
       font-family: 'Archivo Black', sans-serif;
       color: var(--pink);
       font-weight: 400;
-    }
-
-    .legend {
-      list-style: none;
-      padding: 0;
-      margin: 1.75rem 0 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem 1.1rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .legend li {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-    }
-
-    .legend-icon {
-      width: 1.8rem;
-      height: 1.8rem;
-      padding: 0.3rem;
-      border-radius: 6px;
-      background: var(--c);
-      color: var(--ink);
-      border: 2px solid var(--paper);
-    }
-
-    .legend-open .legend-icon {
-      background: transparent;
-      color: color-mix(in srgb, var(--paper) 45%, transparent);
-      border: 2px dashed color-mix(in srgb, var(--paper) 45%, transparent);
     }
 
     .source {
