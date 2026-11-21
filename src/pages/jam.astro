@@ -2,520 +2,658 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import { jam, people, setlist, slotsFor, INSTRUMENTS, type Instrument, type JamSong } from '../data/jam';
-import { songSlug, spotifyLink } from '../data/songs';
+import { jam, people, setlist, INSTRUMENTS, SHEET_URL, type Instrument } from '../data/jam';
+import { allSongs, songSlug, spotifyLink } from '../data/songs';
 import { lyrics } from '../data/lyrics';
+import { icon, renderRoster, renderSetlist, renderStats, type SongLinks } from '../lib/jam-view';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-const GUITAR =
-  '<path d="m11.9 12.1 4.51-4.51"/><path d="M20.1 2.3a1 1 0 0 0-1.4 0l-1.11 1.11A2 2 0 0 0 17 4.83v1.34a2 2 0 0 1-.59 1.42A2 2 0 0 1 17.83 7h1.34a2 2 0 0 0 1.42-.59L21.7 5.3a1 1 0 0 0 0-1.4z"/><path d="m6 16 2 2"/><path d="M8.2 9.9C8.7 8.8 9.8 8 11 8c2.8 0 5 2.2 5 5 0 1.2-.8 2.3-1.9 2.8l-.9.4A2 2 0 0 0 12 18a4 4 0 0 1-4 4c-3.3 0-6-2.7-6-6a4 4 0 0 1 4-4 2 2 0 0 0 1.8-1.2z"/>';
-
-// Inline SVG bodies (24x24, stroke-based) for each instrument.
-const ICONS: Record<Instrument, string> = {
-  vocal:
-    '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/>',
-  guitar: GUITAR,
-  guitar2: GUITAR,
-  guitar3: GUITAR,
-  bass:
-    '<path d="M9.5 14.5 20 4"/><path d="M18.5 2.5 21.5 5.5"/><path d="M19 2l.8.8M21.2 4.2l.8.8"/><path d="M7 11.5c1-.6 2.4-.4 3.2.4l1.9 1.9c.8.8 1 2.2.4 3.2l-.5.8c-.3.5-.3 1.1 0 1.6.6 1-.1 2.6-1.6 2.6-.5 0-1-.2-1.4-.6l-6-6c-.4-.4-.6-.9-.6-1.4 0-1.5 1.6-2.2 2.6-1.6.5.3 1.1.3 1.6 0z"/><path d="m6.5 15.5 2 2"/>',
-  drums:
-    '<path d="m2 2 8 8"/><path d="m22 2-8 8"/><ellipse cx="12" cy="9" rx="10" ry="5"/><path d="M7 13.4v7.9"/><path d="M12 14v8"/><path d="M17 13.4v7.9"/><path d="M2 9v8a10 5 0 0 0 20 0V9"/>',
-  keys:
-    '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M7 5v8M12 5v8M17 5v8"/><path d="M7 13v6M12 13v6M17 13v6"/>',
-};
-
-const toRow = (song: JamSong, i: number) => {
-  const slug = songSlug(song);
-  const slots = (song.everyone ? [] : slotsFor(song)).map((instrument) => ({
-    instrument,
-    player: song.lineup[instrument],
-  }));
-  const open = slots.filter((s) => !s.player).length;
-  return {
-    ...song,
-    index: i + 1,
-    slots,
-    open,
-    lyricsHref: lyrics[slug] ? `${base}/songbook/${slug}/` : undefined,
-    spotify: spotifyLink({ title: song.title, artist: song.artist, length: '0:00', bpm: 0, key: '' }),
-  };
-};
-
-const rows = setlist.map(toRow);
-
-const totalOpen = rows.reduce((sum, r) => sum + r.open, 0);
-const complete = rows.filter((r) => r.open === 0).length;
-
-// Who plays what, per person.
-const byPerson = new Map<string, { song: string; instrument: Instrument }[]>();
-for (const name of people) byPerson.set(name, []);
-for (const song of setlist) {
-  for (const [instrument, player] of Object.entries(song.lineup) as [Instrument, string | undefined][]) {
-    if (!player) continue;
-    if (!byPerson.has(player)) byPerson.set(player, []);
-    byPerson.get(player)!.push({ song: song.title, instrument });
-  }
-}
-const roster = [...byPerson.entries()]
-  .map(([name, parts]) => ({ name, parts }))
-  .sort((a, b) => b.parts.length - a.parts.length || a.name.localeCompare(b.name, 'pt-BR'));
+// Lyrics + Spotify links for every songbook song, so songs added in the sheet
+// still link correctly.
+const links: SongLinks = Object.fromEntries(
+  allSongs().map((song) => {
+    const slug = songSlug(song);
+    return [slug, { lyrics: lyrics[slug] ? `${base}/songbook/${slug}/` : undefined, spotify: spotifyLink(song) }];
+  })
+);
 
 const [y, m, d] = jam.date.split('-');
 const dateLabel = `${d}/${m}/${y}`;
+const legend = (Object.keys(INSTRUMENTS) as Instrument[]).filter((i) => i !== 'guitar2' && i !== 'guitar3');
 ---
 
 <Layout title={`${jam.title} — ${dateLabel}`} description="Quem toca o quê na jam de fim de ano.">
   <Nav />
 
-  <header class="hero">
-    <div class="dots dot-grid" aria-hidden="true"></div>
-    <div class="wrap">
-      <span class="badge hard-sm date">{dateLabel} · {jam.time} · {jam.place}</span>
-      <h1>{jam.title}</h1>
-      <p class="stats">
-        <span><strong>{rows.length}</strong> músicas</span>
-        <span><strong>{complete}</strong> {complete === 1 ? 'completa' : 'completas'}</span>
-        <span><strong>{totalOpen}</strong> {totalOpen === 1 ? 'vaga aberta' : 'vagas abertas'}</span>
-        <span><strong>{people.length}</strong> pessoas</span>
-      </p>
-      <ul class="legend" aria-label="Legenda">
-        {(Object.keys(INSTRUMENTS) as Instrument[])
-          .filter((i) => i !== 'guitar2' && i !== 'guitar3')
-          .map((i) => (
+  <main class="jam-page">
+    <header class="hero">
+      <div class="dots dot-grid" aria-hidden="true"></div>
+      <div class="wrap">
+        <span class="badge hard-sm date">{dateLabel} · {jam.time} · {jam.place}</span>
+        <h1>{jam.title}</h1>
+        <p class="stats" id="jam-stats" set:html={renderStats(setlist, people)} />
+        <ul class="legend" aria-label="Legenda">
+          {legend.map((i) => (
             <li style={`--c: ${INSTRUMENTS[i].color};`}>
-              <span class="legend-icon"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={ICONS[i]} /></span>
+              <span class="legend-icon" set:html={icon(i)} />
               {INSTRUMENTS[i].label}
             </li>
           ))}
-        <li class="legend-open">
-          <span class="legend-icon"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={ICONS.guitar} /></span>
-          Vaga aberta
-        </li>
-      </ul>
-    </div>
-  </header>
-
-  <section class="setlist-sect">
-    <div class="wrap">
-      <h2>Setlist</h2>
-      <ol class="setlist hard">
-        {rows.map((row) => (
-          <li class:list={['song', { full: row.open === 0 }]}>
-            <div class="song-head">
-              <span class="num hard-sm">{row.index}</span>
-              <span class="info">
-                {row.lyricsHref ? (
-                  <a class="title" href={row.lyricsHref}>{row.title}</a>
-                ) : (
-                  <span class="title">{row.title}</span>
-                )}
-                <span class="artist">
-                  {row.artist} · <a href={row.spotify} target="_blank" rel="noopener noreferrer">ouvir</a>
-                </span>
-                {row.note && <span class="note">{row.note}</span>}
-              </span>
-              <span class:list={['status badge hard-sm', { ok: row.open === 0 }]}>
-                {row.everyone ? 'Todo mundo' : row.open === 0 ? 'Completa' : `Faltam ${row.open}`}
-              </span>
-            </div>
-            {row.everyone && <p class="everyone">Todo mundo junto, no final</p>}
-            <ul class="slots">
-              {row.slots.map(({ instrument, player }) => (
-                <li
-                  class:list={['slot', { open: !player }]}
-                  style={`--c: ${INSTRUMENTS[instrument].color};`}
-                  title={`${INSTRUMENTS[instrument].label}: ${player ?? 'vaga aberta'}`}
-                >
-                  <span class="slot-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" set:html={ICONS[instrument]} />
-                  </span>
-                  <span class="slot-text">
-                    <span class="slot-label">{INSTRUMENTS[instrument].label}</span>
-                    <span class="slot-player">{player ?? 'Vaga'}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+          <li class="legend-open">
+            <span class="legend-icon" set:html={icon('guitar')} />
+            Vaga aberta
           </li>
-        ))}
-      </ol>
-    </div>
-  </section>
+        </ul>
+        <p class="source" id="jam-source" data-state="loading">
+          <span class="source-dot"></span>
+          <span class="source-text">Carregando da planilha…</span>
+          <a href={SHEET_URL} target="_blank" rel="noopener noreferrer">Abrir planilha</a>
+        </p>
+      </div>
+    </header>
 
-  <section class="roster-sect">
-    <div class="dots dot-grid" aria-hidden="true"></div>
-    <div class="wrap">
-      <h2>Quem toca o quê</h2>
-      <ul class="roster">
-        {roster.map(({ name, parts }) => (
-          <li class:list={['person hard-sm', { idle: parts.length === 0 }]}>
-            <span class="person-name">{name}</span>
-            {parts.length === 0 ? (
-              <span class="person-empty">Ainda sem música</span>
-            ) : (
-              <ul class="parts">
-                {parts.map((p) => (
-                  <li style={`--c: ${INSTRUMENTS[p.instrument].color};`}>
-                    <span class="part-icon">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" set:html={ICONS[p.instrument]} />
-                    </span>
-                    {p.song}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
+    <section class="setlist-sect">
+      <div class="wrap">
+        <div class="setlist-head">
+          <h2>Setlist</h2>
+          <p class="focus-hint" id="jam-focus-hint">Toque num nome pra ver só as músicas da pessoa.</p>
+        </div>
+        <ol class="setlist hard" id="jam-setlist" set:html={renderSetlist(setlist, people, links)} />
+      </div>
+    </section>
+
+    <section class="roster-sect">
+      <div class="dots dot-grid" aria-hidden="true"></div>
+      <div class="wrap">
+        <h2>Quem toca o quê</h2>
+        <ul class="roster" id="jam-roster" set:html={renderRoster(setlist, people)} />
+      </div>
+    </section>
+  </main>
+
+  <script type="application/json" id="jam-links" set:html={JSON.stringify(links)} />
 
   <Footer />
 </Layout>
 
-<style>
-  svg {
-    width: 100%;
-    height: 100%;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+<script>
+  import { SHEET_CSV_URL } from '../data/jam';
+  import { fromSheet, renderRoster, renderSetlist, renderStats, type SongLinks } from '../lib/jam-view';
+
+  const page = document.querySelector<HTMLElement>('.jam-page')!;
+  const setlistEl = document.getElementById('jam-setlist')!;
+  const rosterEl = document.getElementById('jam-roster')!;
+  const statsEl = document.getElementById('jam-stats')!;
+  const sourceEl = document.getElementById('jam-source')!;
+  const sourceText = sourceEl.querySelector('.source-text')!;
+  const hintEl = document.getElementById('jam-focus-hint')!;
+  const links = JSON.parse(document.getElementById('jam-links')!.textContent || '{}') as SongLinks;
+
+  // --- Person focus: click a name to dim everything they're not on. ---
+  let focus: string | null = null;
+
+  function applyFocus() {
+    page.classList.toggle('has-focus', Boolean(focus));
+    page.querySelectorAll<HTMLElement>('.slot, .person').forEach((el) => {
+      const match = el.dataset.person === focus;
+      el.classList.toggle('focused', Boolean(focus) && match);
+      if (el.classList.contains('person')) el.setAttribute('aria-pressed', String(match));
+    });
+    page.querySelectorAll<HTMLElement>('.song').forEach((song) => {
+      const has = focus ? song.querySelector(`.slot[data-person="${CSS.escape(focus)}"]`) : true;
+      song.classList.toggle('dim', !has);
+    });
+    hintEl.innerHTML = focus
+      ? `Mostrando <strong></strong> · <button type="button" class="clear-focus">ver todos</button>`
+      : 'Toque num nome pra ver só as músicas da pessoa.';
+    if (focus) hintEl.querySelector('strong')!.textContent = focus;
   }
 
-  h2 {
-    font-size: clamp(1.4rem, 4vw, 2rem);
-    margin-bottom: 1.25rem;
+  page.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('.clear-focus')) {
+      focus = null;
+      return applyFocus();
+    }
+    if (target.closest('a')) return;
+    const el = target.closest<HTMLElement>('[data-person]');
+    if (!el) return;
+    focus = focus === el.dataset.person ? null : el.dataset.person!;
+    applyFocus();
+    if (focus && el.classList.contains('person')) {
+      document.querySelector('.setlist-sect')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  page.addEventListener('keydown', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('.person[data-person]');
+    if (el && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      el.click();
+    }
+  });
+
+  // --- Live data from the Google Sheet. ---
+  function setSource(state: 'live' | 'fallback', text: string) {
+    sourceEl.dataset.state = state;
+    sourceText.textContent = text;
   }
 
-  /* Header */
-  .hero {
-    position: relative;
-    overflow: hidden;
-    background: var(--ink);
-    color: var(--paper);
-    padding: 3rem 0 2.5rem;
+  async function load() {
+    try {
+      const res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+      const text = await res.text();
+      // A sheet that isn't shared returns Google's login page, not CSV.
+      if (!res.ok || text.trimStart().startsWith('<')) throw new Error(`HTTP ${res.status}`);
+      const { songs, people } = fromSheet(text);
+      if (songs.length === 0) throw new Error('Planilha vazia');
+
+      setlistEl.innerHTML = renderSetlist(songs, people, links);
+      rosterEl.innerHTML = renderRoster(songs, people);
+      statsEl.innerHTML = renderStats(songs, people);
+      applyFocus();
+      const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      setSource('live', `Ao vivo da planilha · atualizado às ${time}`);
+    } catch (err) {
+      console.warn('[jam] Falha ao carregar a planilha, mostrando a versão salva.', err);
+      setSource('fallback', 'Planilha indisponível · mostrando a versão salva no site');
+    }
   }
 
-  .dots {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
+  load();
+  // Refresh when coming back to the tab (e.g. after editing the sheet).
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') load();
+  });
+</script>
 
-  .hero .wrap,
-  .roster-sect .wrap {
-    position: relative;
-  }
+<style is:global>
+  .jam-page {
+    svg {
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-  .date {
-    background: var(--lime);
-    color: var(--ink);
-    border-color: var(--paper);
-    box-shadow: 4px 4px 0 0 var(--paper);
-  }
+    h2 {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      margin-bottom: 1.25rem;
+    }
 
-  h1 {
-    font-size: clamp(2rem, 7vw, 3.6rem);
-    margin: 1.1rem 0 1rem;
-  }
+    /* Header */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 3rem 0 2.5rem;
+    }
 
-  .stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.4rem;
-    font-size: 0.95rem;
-    opacity: 0.85;
-  }
+    .dots {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
 
-  .stats strong {
-    font-family: 'Archivo Black', sans-serif;
-    color: var(--pink);
-    font-weight: 400;
-  }
+    .hero .wrap,
+    .roster-sect .wrap {
+      position: relative;
+    }
 
-  .legend {
-    list-style: none;
-    padding: 0;
-    margin: 1.75rem 0 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem 1.1rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
+    .date {
+      background: var(--lime);
+      color: var(--ink);
+      border-color: var(--paper);
+      box-shadow: 4px 4px 0 0 var(--paper);
+    }
 
-  .legend li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
+    h1 {
+      font-size: clamp(2rem, 7vw, 3.6rem);
+      margin: 1.1rem 0 1rem;
+    }
 
-  .legend-icon {
-    width: 1.8rem;
-    height: 1.8rem;
-    padding: 0.3rem;
-    border-radius: 6px;
-    background: var(--c);
-    color: var(--ink);
-    border: 2px solid var(--paper);
-  }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.4rem;
+      font-size: 0.95rem;
+      opacity: 0.85;
+    }
 
-  .legend-open .legend-icon {
-    background: transparent;
-    color: color-mix(in srgb, var(--paper) 45%, transparent);
-    border: 2px dashed color-mix(in srgb, var(--paper) 45%, transparent);
-  }
+    .stats strong {
+      font-family: 'Archivo Black', sans-serif;
+      color: var(--pink);
+      font-weight: 400;
+    }
 
-  .everyone {
-    margin: 0.6rem 0 0 3.3rem;
-    font-weight: 700;
-    font-size: 0.9rem;
-  }
+    .legend {
+      list-style: none;
+      padding: 0;
+      margin: 1.75rem 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
 
-  /* Setlist */
-  .setlist-sect {
-    padding: 3rem 0;
-  }
+    .legend li {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
 
-  .setlist {
-    list-style: none;
-    margin: 0;
-    padding: 0.5rem 1.25rem;
-    background: var(--paper);
-  }
+    .legend-icon {
+      width: 1.8rem;
+      height: 1.8rem;
+      padding: 0.3rem;
+      border-radius: 6px;
+      background: var(--c);
+      color: var(--ink);
+      border: 2px solid var(--paper);
+    }
 
-  .song {
-    padding: 1.1rem 0;
-    border-bottom: 2px dashed color-mix(in srgb, var(--ink) 20%, transparent);
-  }
+    .legend-open .legend-icon {
+      background: transparent;
+      color: color-mix(in srgb, var(--paper) 45%, transparent);
+      border: 2px dashed color-mix(in srgb, var(--paper) 45%, transparent);
+    }
 
-  .song:last-child {
-    border-bottom: none;
-  }
+    .source {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
 
-  .song-head {
-    display: grid;
-    grid-template-columns: 2.4rem 1fr auto;
-    align-items: center;
-    gap: 0.9rem;
-  }
+    .source-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--paper) 40%, transparent);
+    }
 
-  .num {
-    width: 2.1rem;
-    height: 2.1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Archivo Black', sans-serif;
-    font-size: 0.85rem;
-    background: var(--paper);
-    box-shadow: 3px 3px 0 0 var(--ink);
-  }
+    .source[data-state='live'] .source-dot {
+      background: var(--lime);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--lime) 30%, transparent);
+    }
 
-  .song.full .num {
-    background: var(--lime);
-  }
+    .source[data-state='fallback'] .source-dot {
+      background: #ffa94d;
+    }
 
-  .info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    min-width: 0;
-  }
+    .source a {
+      font-weight: 700;
+      margin-left: 0.4rem;
+    }
 
-  .title {
-    font-weight: 700;
-    font-size: 1.05rem;
-    text-decoration: none;
-  }
+    /* Setlist */
+    .setlist-sect {
+      padding: 3rem 0;
+    }
 
-  a.title:hover {
-    text-decoration: underline;
-  }
+    .setlist-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem 1rem;
+      margin-bottom: 1.25rem;
+    }
 
-  .artist {
-    font-size: 0.82rem;
-    opacity: 0.65;
-  }
+    .setlist-head h2 {
+      margin: 0;
+    }
 
-  .note {
-    font-size: 0.75rem;
-    font-style: italic;
-    opacity: 0.6;
-  }
+    .focus-hint {
+      font-size: 0.82rem;
+      opacity: 0.7;
+    }
 
-  .status {
-    background: var(--paper);
-    box-shadow: 3px 3px 0 0 var(--ink);
-    font-size: 0.68rem;
-    padding: 0.3rem 0.7rem;
-  }
+    .clear-focus {
+      font: inherit;
+      font-weight: 700;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: inherit;
+    }
 
-  .status.ok {
-    background: var(--lime);
-  }
+    .setlist {
+      list-style: none;
+      margin: 0;
+      padding: 0.5rem 1.25rem;
+      background: var(--paper);
+    }
 
-  .slots {
-    list-style: none;
-    padding: 0;
-    margin: 0.9rem 0 0 3.3rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 0.6rem;
-  }
+    .song {
+      padding: 1.1rem 0;
+      border-bottom: 2px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+      transition: opacity 0.15s ease;
+    }
 
-  .slot {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.45rem 0.6rem;
-    border: 2px solid var(--ink);
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--c) 22%, var(--paper));
-    box-shadow: 3px 3px 0 0 var(--ink);
-  }
+    .song:last-child {
+      border-bottom: none;
+    }
 
-  .slot-icon {
-    flex-shrink: 0;
-    width: 2.2rem;
-    height: 2.2rem;
-    padding: 0.38rem;
-    border-radius: 8px;
-    border: 2px solid var(--ink);
-    background: var(--c);
-    color: var(--ink);
-  }
+    .song.dim {
+      opacity: 0.25;
+    }
 
-  .slot-text {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    line-height: 1.2;
-  }
-
-  .slot-label {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    opacity: 0.6;
-  }
-
-  .slot-player {
-    font-weight: 700;
-    font-size: 0.95rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .slot.open {
-    background: transparent;
-    border: 2px dashed color-mix(in srgb, var(--ink) 30%, transparent);
-    box-shadow: none;
-    color: color-mix(in srgb, var(--ink) 45%, transparent);
-  }
-
-  .slot.open .slot-icon {
-    background: color-mix(in srgb, var(--ink) 6%, transparent);
-    border: 2px dashed color-mix(in srgb, var(--ink) 25%, transparent);
-    color: color-mix(in srgb, var(--ink) 35%, transparent);
-  }
-
-  .slot.open .slot-player {
-    font-weight: 500;
-    font-style: italic;
-  }
-
-  /* Roster */
-  .roster-sect {
-    position: relative;
-    overflow: hidden;
-    background: var(--ink);
-    color: var(--paper);
-    padding: 3rem 0;
-  }
-
-  .roster {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 1rem;
-  }
-
-  .person {
-    background: var(--paper);
-    color: var(--ink);
-    border-color: var(--paper);
-    box-shadow: 4px 4px 0 0 var(--pink);
-    padding: 0.8rem 0.95rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .person.idle {
-    background: transparent;
-    color: var(--paper);
-    border-style: dashed;
-    border-color: color-mix(in srgb, var(--paper) 40%, transparent);
-    box-shadow: none;
-    opacity: 0.7;
-  }
-
-  .person-name {
-    font-family: 'Archivo Black', sans-serif;
-    text-transform: uppercase;
-    font-size: 1rem;
-  }
-
-  .person-empty {
-    font-size: 0.8rem;
-    font-style: italic;
-  }
-
-  .parts {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  .parts li {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
-
-  .part-icon {
-    flex-shrink: 0;
-    width: 1.5rem;
-    height: 1.5rem;
-    padding: 0.22rem;
-    border-radius: 5px;
-    border: 2px solid var(--ink);
-    background: var(--c);
-  }
-
-  @media (max-width: 520px) {
     .song-head {
-      grid-template-columns: 2rem 1fr auto;
-      gap: 0.7rem;
+      display: grid;
+      grid-template-columns: 2.4rem 1fr auto;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .num {
+      width: 2.1rem;
+      height: 2.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.85rem;
+      background: var(--paper);
+      color: var(--ink);
+      text-decoration: none;
+      box-shadow: 3px 3px 0 0 var(--ink);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    a.num:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 0 var(--ink);
+    }
+
+    a.num:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 0 var(--ink);
+    }
+
+    .song.full .num {
+      background: var(--lime);
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      min-width: 0;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      text-decoration: none;
+    }
+
+    a.title:hover {
+      text-decoration: underline;
+    }
+
+    .artist {
+      font-size: 0.82rem;
+      opacity: 0.65;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      font-style: italic;
+      opacity: 0.6;
+    }
+
+    .status {
+      background: var(--paper);
+      box-shadow: 3px 3px 0 0 var(--ink);
+      font-size: 0.68rem;
+      padding: 0.3rem 0.7rem;
+    }
+
+    .status.ok {
+      background: var(--lime);
+    }
+
+    .everyone {
+      margin: 0.6rem 0 0 3.3rem;
+      font-weight: 700;
+      font-size: 0.9rem;
     }
 
     .slots {
-      margin-left: 0;
-      grid-template-columns: 1fr 1fr;
+      list-style: none;
+      padding: 0;
+      margin: 0.9rem 0 0 3.3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.6rem;
+    }
+
+    /* Filled slot: background is the person's color, icon tile is the
+       instrument's color. */
+    .slot {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.45rem 0.6rem;
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      background: var(--p);
+      box-shadow: 3px 3px 0 0 var(--ink);
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+    }
+
+    .slot[data-person]:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 0 var(--ink);
+    }
+
+    .slot-icon {
+      flex-shrink: 0;
+      width: 2.2rem;
+      height: 2.2rem;
+      padding: 0.38rem;
+      border-radius: 8px;
+      border: 2px solid var(--ink);
+      /* White tile so the slot's color clearly belongs to the person. */
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .slot-text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      line-height: 1.2;
+    }
+
+    .slot-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.65;
+    }
+
+    .slot-player {
+      font-weight: 700;
+      font-size: 0.95rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .slot.open {
+      background: transparent;
+      border: 2px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+      box-shadow: none;
+      color: color-mix(in srgb, var(--ink) 45%, transparent);
+      cursor: default;
+    }
+
+    .slot.open .slot-icon {
+      background: color-mix(in srgb, var(--ink) 6%, transparent);
+      border: 2px dashed color-mix(in srgb, var(--ink) 25%, transparent);
+      color: color-mix(in srgb, var(--ink) 35%, transparent);
+    }
+
+    .slot.open .slot-player {
+      font-weight: 500;
+      font-style: italic;
+    }
+
+    &.has-focus .slot[data-person]:not(.focused) {
+      opacity: 0.35;
+    }
+
+    &.has-focus .slot.focused {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 0 var(--ink);
+    }
+
+    /* Roster */
+    .roster-sect {
+      position: relative;
+      overflow: hidden;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 3rem 0;
+    }
+
+    .roster {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1rem;
+    }
+
+    .person {
+      background: var(--paper);
+      color: var(--ink);
+      border-color: var(--paper);
+      box-shadow: 4px 4px 0 0 var(--p);
+      padding: 0.8rem 0.95rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+    }
+
+    .person[data-person]:hover,
+    .person.focused {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 0 var(--p);
+    }
+
+    .person.focused {
+      outline: 3px solid var(--p);
+      outline-offset: 2px;
+    }
+
+    &.has-focus .person[data-person]:not(.focused) {
+      opacity: 0.5;
+    }
+
+    .person.idle {
+      background: transparent;
+      color: var(--paper);
+      border-style: dashed;
+      border-color: color-mix(in srgb, var(--paper) 40%, transparent);
+      box-shadow: none;
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    .person-name {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Archivo Black', sans-serif;
+      text-transform: uppercase;
+      font-size: 1rem;
+    }
+
+    .person-dot {
+      width: 0.95rem;
+      height: 0.95rem;
+      border-radius: 50%;
+      border: 2px solid var(--ink);
+      background: var(--p);
+      flex-shrink: 0;
+    }
+
+    .person-count {
+      margin-left: auto;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.05rem 0.5rem;
+      border-radius: 999px;
+      background: var(--p);
+      border: 2px solid var(--ink);
+    }
+
+    .person-empty {
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+
+    .parts {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .parts li {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .part-icon {
+      flex-shrink: 0;
+      width: 1.5rem;
+      height: 1.5rem;
+      padding: 0.22rem;
+      border-radius: 5px;
+      border: 2px solid var(--ink);
+      background: var(--c);
+    }
+
+    @media (max-width: 520px) {
+      .song-head {
+        grid-template-columns: 2rem 1fr auto;
+        gap: 0.7rem;
+      }
+
+      .slots,
+      .everyone {
+        margin-left: 0;
+      }
+
+      .slots {
+        grid-template-columns: 1fr 1fr;
+      }
     }
   }
 </style>

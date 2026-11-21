@@ -1,8 +1,16 @@
 // Jam session lineup: who plays what on which song.
-// Edit this file to update /jam. Leave an instrument out (or set it to
-// undefined) and the page shows it as an open spot, grayed out.
+//
+// The live source is the Google Sheet below: /jam fetches it in the browser
+// on every visit, so edits there show up without a deploy. The `setlist` and
+// `people` here are the fallback, rendered at build time and shown if the
+// sheet can't be reached (offline, sharing turned off...).
+// Leave an instrument out and the page shows it as an open spot, grayed out.
 
-export type Instrument = 'vocal' | 'guitar' | 'guitar2' | 'guitar3' | 'bass' | 'drums' | 'keys';
+export const SHEET_ID = '1kRcxAhW5S9aT0vGmWeDV2WqeuKEXcFCs458tj05fPJU';
+export const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
+export const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=1`;
+
+export type Instrument = 'vocal' | 'guitar' | 'guitar2' | 'guitar3' | 'bass' | 'drums';
 
 export const INSTRUMENTS: Record<Instrument, { label: string; color: string }> = {
   vocal: { label: 'Voz', color: 'var(--pink)' },
@@ -11,10 +19,9 @@ export const INSTRUMENTS: Record<Instrument, { label: string; color: string }> =
   guitar3: { label: 'Guitarra 3', color: 'var(--periwinkle)' },
   bass: { label: 'Baixo', color: 'var(--lime)' },
   drums: { label: 'Bateria', color: 'var(--sky)' },
-  keys: { label: 'Teclado', color: '#ffb547' },
 };
 
-// Every song shows at least these slots. A song can add more (guitar2, keys)
+// Every song shows at least these slots. A song can add more (guitar2, guitar3)
 // just by listing them in its lineup.
 export const DEFAULT_INSTRUMENTS: Instrument[] = ['vocal', 'guitar', 'bass', 'drums'];
 
@@ -40,7 +47,7 @@ export const people: string[] = [
   'Augusto',
   'Felipe',
   'Gui',
-  'Itamar',
+  'Cabeça',
   'João',
   'Murilo',
   'Neo',
@@ -156,12 +163,3 @@ export const setlist: JamSong[] = [
     everyone: true,
   },
 ];
-
-export function slotsFor(song: JamSong): Instrument[] {
-  const extra = (Object.keys(song.lineup) as Instrument[]).filter(
-    (i) => !DEFAULT_INSTRUMENTS.includes(i)
-  );
-  const all = [...DEFAULT_INSTRUMENTS, ...extra];
-  // Keep a stable order matching INSTRUMENTS.
-  return (Object.keys(INSTRUMENTS) as Instrument[]).filter((i) => all.includes(i));
-}
