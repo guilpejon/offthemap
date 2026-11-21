@@ -14,6 +14,7 @@ const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si
     <div class="nav-links" id="nav-links">
       <a class="nav-link" href={`${base}/ensaios/`}>Repertório</a>
       <a class="nav-link" href={`${base}/songbook/`}>Songbook</a>
+      <a class="nav-link jam-link" href={`${base}/jam/`}>Jam 12/12</a>
       <a class="playlist" href={playlistUrl} target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
           <path
@@ -155,6 +156,10 @@ const playlistUrl = 'https://open.spotify.com/playlist/4Tbg2Hx4fmd5dKqlzIPQAG?si
   .nav-link:hover {
     transform: translate(-2px, -2px);
     box-shadow: 5px 5px 0 0 var(--paper);
+  }
+
+  .jam-link {
+    background: var(--pink);
   }
 
   .playlist {
