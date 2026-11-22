@@ -65,7 +65,7 @@ const dateLabel = `${d}/${m}/${y}`;
 </Layout>
 
 <script>
-  import { SHEET_CSV_URL } from '../data/jam';
+  import { SHEET_CSV_URL, people as knownPeople } from '../data/jam';
   import { fromSheet, renderRoster, renderSetlist, renderStats, type SongLinks } from '../lib/jam-view';
 
   const page = document.querySelector<HTMLElement>('.jam-page')!;
@@ -133,7 +133,11 @@ const dateLabel = `${d}/${m}/${y}`;
       const text = await res.text();
       // A sheet that isn't shared returns Google's login page, not CSV.
       if (!res.ok || text.trimStart().startsWith('<')) throw new Error(`HTTP ${res.status}`);
-      const { songs, people } = fromSheet(text);
+      const sheet = fromSheet(text);
+      const songs = sheet.songs;
+      // The sheet's Pessoas column is easy to break, so the list in jam.ts
+      // (the same names as the sheet's dropdowns) is always included.
+      const people = [...new Set([...knownPeople, ...sheet.people])];
       if (songs.length === 0) throw new Error('Planilha vazia');
 
       setlistEl.innerHTML = renderSetlist(songs, people, links);
