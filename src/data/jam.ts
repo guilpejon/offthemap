@@ -10,10 +10,11 @@ export const SHEET_ID = '1kRcxAhW5S9aT0vGmWeDV2WqeuKEXcFCs458tj05fPJU';
 export const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
 export const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=1`;
 
-export type Instrument = 'vocal' | 'guitar' | 'guitar2' | 'guitar3' | 'bass' | 'drums';
+export type Instrument = 'vocal' | 'vocal2' | 'guitar' | 'guitar2' | 'guitar3' | 'bass' | 'drums';
 
 export const INSTRUMENTS: Record<Instrument, { label: string; color: string }> = {
   vocal: { label: 'Voz', color: 'var(--pink)' },
+  vocal2: { label: 'Voz 2', color: 'var(--pink)' },
   guitar: { label: 'Guitarra', color: 'var(--periwinkle)' },
   guitar2: { label: 'Guitarra 2', color: 'var(--periwinkle)' },
   guitar3: { label: 'Guitarra 3', color: 'var(--periwinkle)' },
@@ -21,7 +22,7 @@ export const INSTRUMENTS: Record<Instrument, { label: string; color: string }> =
   drums: { label: 'Bateria', color: 'var(--sky)' },
 };
 
-// Every song shows at least these slots. A song can add more (guitar2, guitar3)
+// Every song shows at least these slots. A song can add more (vocal2, guitar2, guitar3)
 // just by listing them in its lineup.
 export const DEFAULT_INSTRUMENTS: Instrument[] = ['vocal', 'guitar', 'bass', 'drums'];
 

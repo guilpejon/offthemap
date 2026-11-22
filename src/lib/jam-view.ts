@@ -7,13 +7,16 @@ import { songSlug } from '../data/songs';
 // Per-song links, keyed by song slug. Built at compile time from the songbook.
 export type SongLinks = Record<string, { lyrics?: string; spotify?: string }>;
 
+const MIC =
+  '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/>';
+
 const GUITAR =
   '<path d="m11.9 12.1 4.51-4.51"/><path d="M20.1 2.3a1 1 0 0 0-1.4 0l-1.11 1.11A2 2 0 0 0 17 4.83v1.34a2 2 0 0 1-.59 1.42A2 2 0 0 1 17.83 7h1.34a2 2 0 0 0 1.42-.59L21.7 5.3a1 1 0 0 0 0-1.4z"/><path d="m6 16 2 2"/><path d="M8.2 9.9C8.7 8.8 9.8 8 11 8c2.8 0 5 2.2 5 5 0 1.2-.8 2.3-1.9 2.8l-.9.4A2 2 0 0 0 12 18a4 4 0 0 1-4 4c-3.3 0-6-2.7-6-6a4 4 0 0 1 4-4 2 2 0 0 0 1.8-1.2z"/>';
 
 // Inline SVG bodies (24x24, stroke-based) for each instrument.
 export const ICONS: Record<Instrument, string> = {
-  vocal:
-    '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/>',
+  vocal: MIC,
+  vocal2: MIC,
   guitar: GUITAR,
   guitar2: GUITAR,
   guitar3: GUITAR,
@@ -205,7 +208,7 @@ const norm = (s: string) => s.trim().toLowerCase();
 // Música, Artista, one column per instrument label (Voz, Guitarra, ...),
 // Nota, and a separate Pessoas column listing everyone who's coming.
 // A "?" in an instrument cell shows an open spot even for optional
-// instruments (Guitarra 2, Guitarra 3). "Todo mundo" in Nota marks a
+// instruments (Voz 2, Guitarra 2, Guitarra 3). "Todo mundo" in Nota marks a
 // whole-group song.
 export function fromSheet(csv: string): { songs: JamSong[]; people: string[] } {
   const [header = [], ...rows] = parseCsv(csv);
